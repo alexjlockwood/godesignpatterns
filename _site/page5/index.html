@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <meta name="description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Android Design Patterns" />
+    
+    <meta property="og:type" content="blog" />
+    
+    <meta property="og:url" content="/page5/index.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon256.png" />
+    <title>Android Design Patterns</title>
+    <link rel="canonical" href="/page5/index.html" />
+    <link rel="icon" href="/assets/images/favicon128.png" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          
+  <article class="snippet">
+    <div class="side">
+      <div class="date-posted">
+        <span class="date-block">Jul 6 2012</span>
+      </div>
+    </div>
+    <div class="body">
+      <header><h2 class="post-title no-border"><a href="/2012/07/loaders-and-loadermanager-background.html">Life Before Loaders (part 1)</a></h2></header>
+      <p>This post gives a brief introduction to <code>Loader</code>s and the <code>LoaderManager</code>. The first
+section describes how data was loaded prior to the release of Android 3.0, pointing out out some of the flaws
+of the pre-Honeycomb APIs. The second section defines the purpose of each class and summarizes their powerful
+ability in asynchronously loading data.</p>
+
+<p>This is the first of a series of posts I will be writing on Loaders and the LoaderManager:</p>
+
+<ul>
+<li><strong>Part 1:</strong> <a href="/2012/07/loaders-and-loadermanager-background.html">Life Before Loaders</a></li>
+<li><strong>Part 2:</strong> <a href="/2012/07/understanding-loadermanager.html">Understanding the LoaderManager</a></li>
+<li><strong>Part 3:</strong> <a href="/2012/08/implementing-loaders.html">Implementing Loaders</a></li>
+<li><strong>Part 4:</strong> <a href="/2012/09/tutorial-loader-loadermanager.html">Tutorial: AppListLoader</a></li>
+</ul>
+
+<p>If you know nothing about <code>Loader</code>s and the <code>LoaderManager</code>, I strongly recommend you read the
+<a href="http://developer.android.com/guide/components/loaders.html">documentation</a> before continuing forward.</p>
+
+<h3>The Not-So-Distant Past</h3>
+
+<p>Before Android 3.0, many Android applications lacked in responsiveness. UI interactions glitched, transitions
+between activities lagged, and ANR (Application Not Responding) dialogs rendered apps totally useless. This
+lack of responsiveness stemmed mostly from the fact that developers were performing queries on the UI
+thread&mdash;a very poor choice for lengthy operations like loading data.</p>
+
+<p>While the <a href="http://developer.android.com/guide/practices/responsiveness.html">documentation</a> has always
+stressed the importance of instant feedback, the pre-Honeycomb APIs simply did not encourage this behavior. Before
+Loaders, cursors were primarily managed and queried for with two (now deprecated) <code>Activity</code> methods:</p>
+
+      <footer>
+        <a class="read-more" href="/2012/07/loaders-and-loadermanager-background.html">Read more&#8230;</a>
+      </footer>
+    </div>
+    <div class="clearfix"></div>
+  </article>
+  
+
+  <article class="snippet">
+    <div class="side">
+      <div class="date-posted">
+        <span class="date-block">Jun 25 2012</span>
+      </div>
+    </div>
+    <div class="body">
+      <header><h2 class="post-title no-border"><a href="/2012/06/content-resolvers-and-content-providers.html">Content Providers &amp; Content Resolvers</a></h2></header>
+      <p>Content Providers and Content Resolvers are a common source of confusion for beginning
+Android developers. Further, online tutorials and sample code are not sufficient in
+describing how the two classes work together to provide access to the Android data
+model. This post hopes to fill in this gap by explaining their place in the
+<code>android.content</code> package. It concludes with a walk through the life of a
+simple query to the Content Resolver.</p>
+
+      <footer>
+        <a class="read-more" href="/2012/06/content-resolvers-and-content-providers.html">Read more&#8230;</a>
+      </footer>
+    </div>
+    <div class="clearfix"></div>
+  </article>
+  
+  <!-- Display ad after second post snippet -->
+  <!--<div id="responsive-home-page-first-ad">
+    <ins class="adsbygoogle"
+	 style="display:block"
+	 data-ad-client="ca-pub-3588752900040136"
+	 data-ad-slot="7147625658"
+	 data-ad-format="auto"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>-->
+  
+
+  <article class="snippet">
+    <div class="side">
+      <div class="date-posted">
+        <span class="date-block">Jun 18 2012</span>
+      </div>
+    </div>
+    <div class="body">
+      <header><h2 class="post-title no-border"><a href="/2012/06/app-force-close-honeycomb-ics.html">Why Ice Cream Sandwich Crashes your App</a></h2></header>
+      <p>The following question has plagued StackOverflow ever since Ice Cream
+Sandwich&#39;s initial release:</p>
+
+<blockquote>
+<p>My application works fine on devices running Android 2.x, but
+force closes on devices running Honeycomb (3.x) and Ice Cream
+Sandwich (4.x). Why does this occur?</p>
+</blockquote>
+
+<p>This is a great question; after all, newer versions of Android are
+released with the expectation that old apps will remain compatible
+with new devices. In my experience, there are a couple reasons why
+this might occur. Most of the time, however, the reason is simple:
+<em>you are performing a potentially expensive operation on the UI
+thread</em>.</p>
+
+      <footer>
+        <a class="read-more" href="/2012/06/app-force-close-honeycomb-ics.html">Read more&#8230;</a>
+      </footer>
+    </div>
+    <div class="clearfix"></div>
+  </article>
+  
+
+  <article class="snippet">
+    <div class="side">
+      <div class="date-posted">
+        <span class="date-block">Jun 14 2012</span>
+      </div>
+    </div>
+    <div class="body">
+      <header><h2 class="post-title no-border"><a href="/2012/06/compatability-manager-utility-class.html">Ensuring Compatibility with a Utility Class</a></h2></header>
+      <p>This post introduces the concept of a <strong>utility class</strong> and gives a simple
+example of how you can use one to tidy up your code. As Android projects grow in size, it
+becomes increasingly important that your code remains organized and well-structured.
+Providing a utility class for commonly called methods can help tremendously in reducing
+the complexity of your project, allowing you to structure your code in a readable and
+easily understandable way.</p>
+
+      <footer>
+        <a class="read-more" href="/2012/06/compatability-manager-utility-class.html">Read more&#8230;</a>
+      </footer>
+    </div>
+    <div class="clearfix"></div>
+  </article>
+  
+
+
+  <div class="mod-pagination">
+    
+      
+        <div class="prev"><a rel="prev" href="/page4">&#171; Newer</a></div>
+      
+    
+    
+      <div class="next"><a rel="next" href="/page6">Older &#187;</a></div>
+    
+  </div>
+
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>+1 this blog!</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div style="text-align:center">
+              <div class="g-plusone" data-href=""></div>
+	      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+	      <div class="fb-like" data-href="/page5/index.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+            </div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <!-- +1 button javascript -->
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+    <!-- Tweet button javascript -->
+    <script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+    <!-- Like button javascript -->
+    <div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+  </body>
+</html>

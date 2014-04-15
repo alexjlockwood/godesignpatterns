@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Binders &amp; Death Recipients" />
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2013-08-05T00:00:00-04:00" />
+    <meta property="article:modified_time" content="2013-08-05T00:00:00-04:00" />
+    
+    <meta property="og:url" content="/2013/08/binders-death-recipients.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon.jpg" />
+    <title>Binders &amp; Death Recipients | Android Design Patterns</title>
+    <link rel="canonical" href="/2013/08/binders-death-recipients.html" />
+    <link rel="icon" href="/assets/images/favicon.jpg" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          <div itemscope itemtype="http://schema.org/BlogPosting" class="post">
+  <header><h1 itemprop="name">Binders &amp; Death Recipients</h1></header>
+
+  <div class="side">
+    <div class="date-posted" >
+      Posted <span itemprop="datePublished" content="2013-08-05T00:00:00-04:00" class="date">Aug 5, 2013</span>
+      <div class="author">by <a href="https://google.com/+AlexLockwood"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Alex Lockwood</span></span></a></div>
+    </div>
+
+    <div class="share-buttons">
+      <div class="g-plusone" data-size="medium"></div>
+      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+      <div class="fb-like" data-href="/2013/08/binders-death-recipients.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div itemprop="articleBody">
+      <blockquote>
+<p>Note: before you begin, make sure you&#39;ve read my <a href="/2013/07/binders-window-tokens.html">previous post</a>
+about Binder tokens!</p>
+</blockquote>
+
+<p>Since the very beginning, Android&#39;s central focus has been the ability to multitask. In order to achieve it,
+Android takes a unique approach by allowing multiple applications to run at the same time. Applications are
+never explicitly closed by the user, but are instead left running at a low priority to be killed by the system
+when memory is low. This ability to keep processes waiting in the background speeds up app-switching later
+down the line.</p>
+
+<p>Developers learn early on that the key to how Android handles applications in this way is that <strong>processes
+aren&#39;t shut down cleanly</strong>. Android doesn&#39;t rely on applications being well-written and responsive to
+polite requests to exit. Rather, it brutally force-kills them without warning, allowing the kernel to
+immediately reclaim resources associated with the process. This helps prevent serious out of memory situations
+and gives Android total control over misbehaving apps that are negatively impacting the system. For this reason,
+there is no guarantee that any user-space code (such as an Activity&#39;s <code>onDestroy()</code> method) will
+ever be executed when an application&#39;s process goes away.</p>
+
+<!--more-->
+
+<p>Considering the limited memory available in mobile environments, this approach seems promising. However, there
+is still one issue that needs to be addressed: <em>how should the system detect an application&#39;s death so that
+it can quickly clean up its state</em>? When an application dies, its state will be spread over dozens of system
+services (the Activity Manager, Window Manager, Power Manager, etc.) and several different processes. These
+system services need to be notified immediately when an application dies so that they can clean up its state
+and maintain an accurate snapshot of the system. Enter death recipients.</p>
+
+<h3>Death Recipients</h3>
+
+<p>As it turns out, this task is made easy using the <code>Binder</code>&#39;s &quot;link-to-death&quot; facility, which allows a process to get a callback when another process hosting a binder object goes away. In Android, any process can receive a notification when another process dies by taking the following steps:</p>
+
+<ol>
+<li><p>First, the process creates a <a href="http://developer.android.com/reference/android/os/IBinder.DeathRecipient.html"><code>DeathRecipient</code></a> 
+ callback object containing the code to be executed when the death notification arrives.</p></li>
+<li><p>Next, it obtains a reference to a <code>Binder</code> object that lives in another process and calls its 
+ <a href="http://developer.android.com/reference/android/os/Binder.html#linkToDeath(android.os.IBinder.DeathRecipient, int)"><code>linkToDeath(IBinder.DeathRecipient recipient, int flags)</code></a>,
+ passing the <code>DeathRecipient</code> callback object as the first argument.</p></li>
+<li><p>Finally, it waits for the process hosting the <code>Binder</code> object to die. When the Binder kernel
+ driver detects that the process hosting the <code>Binder</code> is gone, it will notify the registered
+ <code>DeathRecipient</code> callback object by calling its 
+ <a href="http://developer.android.com/reference/android/os/IBinder.DeathRecipient.html#binderDied()"><code>binderDied()</code></a>
+ method.</p></li>
+</ol>
+
+<p>Analyzing the source code once again gives some insight into how this pattern is used inside the framework.
+Consider an example application that (similar to the example given in my <a href="/2013/07/binders-window-tokens.html">previous post</a>)
+acquires a wake lock in <code>onCreate()</code>, but is abruptly killed by the system before it is
+able to release the wake lock in <code>onDestroy()</code>. How and when will the
+<a href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.1/services/java/com/android/server/power/PowerManagerService.java"><code>PowerManagerService</code></a>
+be notified so that it can quickly release the wake lock before wasting the device&#39;s battery? As you might
+expect, the <code>PowerManagerService</code> achieves this by registering a <code>DeathRecipient</code>
+(note that some of the source code has been cleaned up for the sake of brevity):</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * The global power manager system service. Application processes </span>
+<span class="cm"> * interact with this class remotely through the PowerManager class.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see frameworks/base/services/java/com/android/server/power/PowerManagerService.java</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">PowerManagerService</span> <span class="kd">extends</span> <span class="n">IPowerManager</span><span class="o">.</span><span class="na">Stub</span> <span class="o">{</span>
+
+  <span class="c1">// List of all wake locks acquired by applications.</span>
+  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">WakeLock</span><span class="o">&gt;</span> <span class="n">mWakeLocks</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">WakeLock</span><span class="o">&gt;();</span>
+
+  <span class="nd">@Override</span> <span class="c1">// Binder call</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">acquireWakeLock</span><span class="o">(</span><span class="n">IBinder</span> <span class="n">token</span><span class="o">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">,</span> <span class="n">String</span> <span class="n">tag</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">WakeLock</span> <span class="n">wakeLock</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WakeLock</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">flags</span><span class="o">,</span> <span class="n">tag</span><span class="o">);</span>
+
+    <span class="c1">// Register to receive a notification when the process hosting </span>
+    <span class="c1">// the token goes away.</span>
+    <span class="n">token</span><span class="o">.</span><span class="na">linkToDeath</span><span class="o">(</span><span class="n">wakeLock</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+
+    <span class="c1">// Acquire the wake lock by adding it as an entry to the list.</span>
+    <span class="n">mWakeLocks</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">wakeLock</span><span class="o">);</span>
+
+    <span class="n">updatePowerState</span><span class="o">();</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span> <span class="c1">// Binder call</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">releaseWakeLock</span><span class="o">(</span><span class="n">IBinder</span> <span class="n">token</span><span class="o">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">findWakeLockIndex</span><span class="o">(</span><span class="n">token</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// The client app has sent us an invalid token, so ignore</span>
+      <span class="c1">// the request.</span>
+      <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// Release the wake lock by removing its entry from the list.</span>
+    <span class="n">WakeLock</span> <span class="n">wakeLock</span> <span class="o">=</span> <span class="n">mWakeLocks</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+    <span class="n">mWakeLocks</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+
+    <span class="c1">// We no longer care about receiving death notifications.</span>
+    <span class="n">wakeLock</span><span class="o">.</span><span class="na">mToken</span><span class="o">.</span><span class="na">unlinkToDeath</span><span class="o">(</span><span class="n">wakeLock</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+
+    <span class="n">updatePowerState</span><span class="o">();</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="kt">int</span> <span class="nf">findWakeLockIndex</span><span class="o">(</span><span class="n">IBinder</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">mWakeLocks</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">mWakeLocks</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">mToken</span> <span class="o">==</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">i</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Represents a wake lock that has been acquired by an application.</span>
+<span class="cm">   */</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">WakeLock</span> <span class="kd">implements</span> <span class="n">IBinder</span><span class="o">.</span><span class="na">DeathRecipient</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">IBinder</span> <span class="n">mToken</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">mFlags</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">mTag</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">WakeLock</span><span class="o">(</span><span class="n">IBinder</span> <span class="n">token</span><span class="o">,</span> <span class="n">inf</span> <span class="n">flags</span><span class="o">,</span> <span class="n">String</span> <span class="n">tag</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">mToken</span> <span class="o">=</span> <span class="n">token</span><span class="o">;</span>
+      <span class="n">mFlags</span> <span class="o">=</span> <span class="n">flags</span><span class="o">;</span>
+      <span class="n">mTag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">binderDied</span><span class="o">()</span> <span class="o">{</span>
+      <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">mWakeLocks</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span><span class="o">;</span>
+      <span class="o">}</span>
+
+      <span class="c1">// The token&#39;s hosting process was killed before it was</span>
+      <span class="c1">// able to explicitly release the wake lock, so release </span>
+      <span class="c1">// it for them.</span>
+      <span class="n">mWakeLocks</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+
+      <span class="n">updatePowerState</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Updates the global power state of the device.</span>
+<span class="cm">   */</span>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">updatePowerState</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>The code might seem a little dense at first, but the concept is simple:</p>
+
+<ul>
+<li><p>When the application requests to acquire a wake lock, the power manager service&#39;s
+<code>acquireWakeLock()</code> method is called. The power manager service registers
+the wake lock for the application, and also links to the death of the wake lock&#39;s
+unique <code>Binder</code> token so that it can get notified if the application process
+is abruptly killed.</p></li>
+<li><p>When the application requests to release a wake lock, the power manager service&#39;s
+<code>releaseWakeLock()</code> method is called. The power manager service releases
+the wake lock for the application, and also unlinks to the death of the wake lock&#39;s
+unique <code>Binder</code> token (as it no longer cares about getting notified when
+the application process dies).</p></li>
+<li><p>When the application is abruptly killed before the wake lock is explicitly released,
+the Binder kernel driver notices that the wake lock&#39;s Binder token has been linked
+to the death of the application process. The Binder kernel driver quickly dispatches
+a death notification to the registered death recipient&#39;s <code>binderDied()</code>
+method, which quickly releases the wake lock and updates the device&#39;s power state.</p></li>
+</ul>
+
+<h3>Examples in the Framework</h3>
+
+<p>The <code>Binder</code>&#39;s link-to-death feature is an incredibly useful tool that is 
+used extensively by the framework&#39;s system services. Here are some of the more 
+interesting examples:</p>
+
+<ul>
+<li><p>The window manager links to the death of the window&#39;s 
+<a href="https://developer.android.com/reference/android/view/Window.Callback.html">callback interface</a>.
+In the rare case that the application&#39;s process is killed while its windows are still showing, 
+the window manager will receive a death notification callback, at which point it can clean up after
+the application by closing its windows.</p></li>
+<li><p>When an application binds to a remote service, the application links to the death of the binder
+stub returned by the remote service&#39;s <code>onBind()</code> method. If the remote service suddenly
+dies, the registered death recipient&#39;s <code>binderDied()</code> method is called, which contains
+some clean up code, as well as the code that calls the
+<a href="https://developer.android.com/reference/android/content/ServiceConnection.html#onServiceDisconnected(android.content.ComponentName)"><code>onServiceDisconnected(ComponentName)</code></a>
+method (the source code illustrating how this is done is located
+<a href="https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/core/java/android/app/LoadedApk.java">here</a>).</p></li>
+<li><p>Many other system services depend on the Binder&#39;s link-to-death facility in order to ensure that
+expensive resources aren&#39;t leaked when an application process is forcefully killed. Some other examples
+(not including the <code>PowerManagerService</code>) are the
+<a href="https://android.googlesource.com/platform/frameworks/base/+/master/services/java/com/android/server/VibratorService.java"><code>VibratorService</code></a>,
+<a href="https://android.googlesource.com/platform/frameworks/base/+/master/services/java/com/android/server/LocationManagerService.java"><code>LocationManagerService</code></a>,
+<a href="https://android.googlesource.com/platform/frameworks/base/+/master/services/java/com/android/server/location/GpsLocationProvider.java"><code>GpsLocationProvider</code></a>,
+and the <a href="https://android.googlesource.com/platform/frameworks/base/+/master/services/java/com/android/server/wifi/WifiService.java"><code>WifiService</code></a>.</p></li>
+</ul>
+
+<h3>Additional Reading</h3>
+
+<p>If you would like to learn more about <code>Binder</code>s and how they work at a deeper level, I&#39;ve included
+some links below. These articles were extremely helpful to me as I was writing these last two posts about
+<code>Binder</code> tokens and <code>DeathRecipient</code>s, and I would strongly recommend reading them
+if you get a chance!</p>
+
+<ul>
+<li><a href="https://lkml.org/lkml/2009/6/25/3">This post</a> is what initially got me interested in this
+topic. Special thanks to <a class="g-profile" href="http://plus.google.com/105051985738280261832" target="_blank">+Dianne Hackborn</a>
+for explaining this!</li>
+<li><a href="http://www.nds.rub.de/media/attachments/files/2012/03/binder.pdf">A great paper</a> which
+explains almost everything you need to know about Binders.</li>
+<li><a href="http://events.linuxfoundation.org/images/stories/slides/abs2013_gargentas.pdf">These slides</a> are
+another great Binder resource.</li>
+<li><a href="https://plus.google.com/105051985738280261832/posts/ACaCokiLfqK">This Google+ post</a> talks about
+how/why live wallpapers are given their own window.</li>
+<li><a href="http://android-developers.blogspot.com/2010/04/multitasking-android-way.html">A great blog post</a>
+discussing multitasking in Android.</li>
+<li><a href="https://plus.google.com/105051985738280261832/posts/XAZ4CeVP6DC">This Google+ post</a> talks about
+how windows are crucial in achieving secure and efficient graphics performance.</li>
+<li><a href="http://shop.oreilly.com/product/0636920021094.do">This book</a> taught me a lot about how the
+application framework works from an embedded systems point of view... and it taught me a couple of really cool
+<code>adb</code> commands too!</li>
+</ul>
+
+<p>As always, thanks for reading, and leave a comment if you have any questions. Don&#39;t forget to +1
+this blog and share this post on Google+ if you found it interesting!</p>
+
+    </div>
+    
+    <div class="post-pagination">
+      
+      <div class="prev"><a rel="prev" href="/2013/07/binders-window-tokens.html">Older &#187;</a></div>
+      
+      
+      <div class="next"><a rel="next" href="/2013/08/fragment-transaction-commit-state-loss.html">&#171; Newer</a></div>
+      
+    </div>
+
+    <div id="responsive-post-bottom-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="6089694851"
+           data-ad-format="auto"></ins>
+      <script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+    
+    <div class="post-comments">
+      <div id="disqus_thread"></div>
+      <script src="/scripts/disqus-lazy-load.js"></script>
+    </div>
+    
+  </div>
+
+  
+  <div class="side suggested">
+    <h4>Related Posts</h4>
+    <ul class="related">
+    <li><a href="/2014/01/thread-scheduling-in-android.html">Thread Scheduling in Android</a></li>
+    <li><a href="/2013/07/binders-window-tokens.html">Binders &amp; Window Tokens</a></li>
+    <li><a href="/2012/10/sqlite-contentprovider-thread-safety.html">SQLite, Content Providers, &amp; Thread Safety</a></li>
+    </ul>
+  </div>
+  
+</div>
+
+<!-- Tweet button javascript -->
+<script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+<!-- Like button javascript -->
+<div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>About this Blog</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div class="g-plusone" data-annotation="inline" data-width="300" data-href=""></div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+  </body>
+</html>

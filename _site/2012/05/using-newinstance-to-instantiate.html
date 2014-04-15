@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Using newInstance() to Instantiate a Fragment" />
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2012-05-24T00:00:00-04:00" />
+    <meta property="article:modified_time" content="2012-05-24T00:00:00-04:00" />
+    
+    <meta property="og:url" content="/2012/05/using-newinstance-to-instantiate.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon256.png" />
+    <title>Using newInstance() to Instantiate a Fragment | Android Design Patterns</title>
+    <link rel="canonical" href="/2012/05/using-newinstance-to-instantiate.html" />
+    <link rel="icon" href="/assets/images/favicon128.png" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          <div itemscope itemtype="http://schema.org/BlogPosting" class="post">
+  <header><h1 itemprop="name">Using newInstance() to Instantiate a Fragment</h1></header>
+
+  <div class="side">
+    <div class="date-posted" >
+      Posted <span itemprop="datePublished" content="2012-05-24T00:00:00-04:00" class="date">May 24, 2012</span>
+      <div class="author">by <a href="https://google.com/+AlexLockwood"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Alex Lockwood</span></span></a></div>
+    </div>
+
+    <div class="share-buttons">
+      <div class="g-plusone" data-size="medium"></div>
+      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+      <div class="fb-like" data-href="/2012/05/using-newinstance-to-instantiate.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div itemprop="articleBody">
+      <p>I recently came across an interesting question on StackOverflow regarding Fragment instantiation:</p>
+
+<blockquote>
+<p>What is the difference between <code>new MyFragment()</code> and <code>MyFragment.newInstance()</code>?
+Should I prefer one over the other?</p>
+</blockquote>
+
+<p>Good question. The answer, as the title of this blog suggests, is a matter of proper design. In this
+case, the <code>newInstance()</code> method is a &quot;static factory method,&quot; allowing us to initialize and setup a
+new <code>Fragment</code> without having to call its constructor and additional setter methods. Providing static
+factory methods for your fragments is good practice because it encapsulates and abstracts the steps
+required to setup the object from the client. For example, consider the following code:</p>
+
+<!--more-->
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyFragment</span> <span class="kd">extends</span> <span class="n">Fragment</span> <span class="o">{</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Static factory method that takes an int parameter,</span>
+<span class="cm">     * initializes the fragment&#39;s arguments, and returns the</span>
+<span class="cm">     * new fragment to the client.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">MyFragment</span> <span class="nf">newInstance</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">MyFragment</span> <span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyFragment</span><span class="o">();</span>
+        <span class="n">Bundle</span> <span class="n">args</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Bundle</span><span class="o">();</span>
+        <span class="n">args</span><span class="o">.</span><span class="na">putInt</span><span class="o">(</span><span class="s">&quot;index&quot;</span><span class="o">,</span> <span class="n">index</span><span class="o">);</span>
+        <span class="n">f</span><span class="o">.</span><span class="na">setArguments</span><span class="o">(</span><span class="n">args</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div>
+<p>Rather than having the client call the default constructor and manually set the fragment&#39;s arguments
+themselves, we provide a static factory method that does this for them. This is preferred over the
+default constructor for two reasons. One, it&#39;s convenient for the client, and two, it enforces well-defined
+behavior. By providing a static factory method, we protect ourselves from bugs down the line&mdash;we no
+longer need to worry about accidentally forgetting to initialize the fragment&#39;s arguments or incorrectly doing so.</p>
+
+<p>Overall, while the difference between the two is mostly just a matter of design, this difference is really
+important because it provides another level of abstraction and makes code a lot easier to understand.</p>
+
+<p>Feel free to leave a comment if this blog post helped (it will motivate me to write more in the future)! :)</p>
+
+    </div>
+    
+    <div class="post-pagination">
+      
+      <div class="prev"><a rel="prev" href="/2012/05/correctly-managing-your-sqlite-database.html">Older &#187;</a></div>
+      
+      
+      <div class="next"><a rel="next" href="/2012/05/why-you-should-use-loadermanager.html">&#171; Newer</a></div>
+      
+    </div>
+
+    <div id="responsive-post-bottom-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="6089694851"
+           data-ad-format="auto"></ins>
+      <script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+    
+    <div class="post-comments">
+      <div id="disqus_thread"></div>
+      <script src="/scripts/disqus-lazy-load.js"></script>
+    </div>
+    
+  </div>
+
+  
+</div>
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>+1 this blog!</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div style="text-align:center">
+              <div class="g-plusone" data-href=""></div>
+	      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+	      <div class="fb-like" data-href="/2012/05/using-newinstance-to-instantiate.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+            </div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <!-- +1 button javascript -->
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+    <!-- Tweet button javascript -->
+    <script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+    <!-- Like button javascript -->
+    <div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+  </body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Reaping the Benefits of the LoaderManager" />
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2012-05-26T00:00:00-04:00" />
+    <meta property="article:modified_time" content="2012-05-26T00:00:00-04:00" />
+    
+    <meta property="og:url" content="/2012/05/why-you-should-use-loadermanager.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon.jpg" />
+    <title>Reaping the Benefits of the LoaderManager | Android Design Patterns</title>
+    <link rel="canonical" href="/2012/05/why-you-should-use-loadermanager.html" />
+    <link rel="icon" href="/assets/images/favicon.jpg" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          <div itemscope itemtype="http://schema.org/BlogPosting" class="post">
+  <header><h1 itemprop="name">Reaping the Benefits of the LoaderManager</h1></header>
+
+  <div class="side">
+    <div class="date-posted" >
+      Posted <span itemprop="datePublished" content="2012-05-26T00:00:00-04:00" class="date">May 26, 2012</span>
+      <div class="author">by <a href="https://google.com/+AlexLockwood"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Alex Lockwood</span></span></a></div>
+    </div>
+
+    <div class="share-buttons">
+      <div class="g-plusone" data-size="medium"></div>
+      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+      <div class="fb-like" data-href="/2012/05/why-you-should-use-loadermanager.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div itemprop="articleBody">
+      <p>With Android 3.0 came the introduction of the <code>LoaderManager</code> class, an abstract
+class associated with an <code>Activity</code> or <code>Fragment</code> for managing one or
+more <code>Loader</code> instances. The <code>LoaderManager</code> class is one of my favorite
+additions to the Android framework for a number of reasons, but mostly because it <em>significantly</em>
+reduces code complexity and makes your application run a lot smoother. Implementing data loaders
+with the <code>LoaderManager</code> is simple to implement, and takes care of everything about
+lifecycle management so are much less error prone.</p>
+
+<!--more-->
+
+<p>While applications are free to write their own loaders for loading various types of data, the
+most common (and simplest) use of the <code>LoaderManager</code> is with a <code>CursorLoader</code>.
+When done correctly, the <code>CursorLoader</code> class offloads the work of loading data on a thread,
+and keeps the data persistent during short term activity refresh events, such as an orientation change.
+In addition to performing the initial query, the <code>CursorLoader</code> registers a
+<code>ContentObserver</code> with the dataset you requested and calls <code>forceLoad()</code>
+on itself when the data set changes, and is thus auto-updating. This is extremely convenient for
+the programmer, as he doesn&#39;t have to worry about performing these queries himself. Further,
+for bigger screens it becomes more important that you query on a separate thread since configuration
+changes involve recreating the entire view layout, a complex operation that can cause disasters
+when blocked.</p>
+
+<p>As mentioned earlier, one could implement his or her class to load data on a separate
+thread using an <code>AsyncTask</code> or even a <code>Thread</code>.
+The point, however, is that the <code>LoaderManager</code> does this all for you, so
+it&#39;s convenient for the developer, less error prone, and simple to implement. Of course
+it is possible to use an <code>AsyncTask</code> to keep your application UI thread friendly,
+but it will involve a lot more code, and implementing your class so that it will retain the
+loaded <code>Cursor</code> over the twists and turns of the <code>Activity</code> lifecycle
+won&#39;t be simple. The bottom line is that <code>LoaderManager</code> will do this automatically
+for you, as well as taking care of correctly creating and closing the <code>Cursor</code>
+based on the <code>Activity</code> lifecycle.</p>
+
+<p>To use <code>LoaderManager</code> with (or without) the <code>CursorLoader</code>
+in an app targeting pre-Honeycomb devices, you should make use of the classes provided
+in the Android Support Package, including the <code>FragmentActivity</code> class. A
+<code>FragmentActivity</code> is just an <code>Activity</code> that has been created
+for Android compatibility support, and does not require the use of fragments in your
+application. When transitioning from an <code>Activity</code>s to <code>FragmentActivity</code>s,
+be extremely careful that you use the <code>getSupportLoaderManager()</code> instead of
+<code>getLoaderManager()</code>. <code>FragmentActivity</code> extends <code>Activity</code>,
+thus inheriting all of its methods, and as a result the compiler will not complain if you
+accidentally mix up these methods, so be very careful!</p>
+
+<p><p>Leave a comment if you have any questions or criticisms... or just to let me know
+that you managed to read through this entire post without getting distracted! I&#39;m also
+open to providing more explicit code samples if anyone asks.</p>
+
+    </div>
+    
+    <div class="post-pagination">
+      
+      <div class="prev"><a rel="prev" href="/2012/05/using-newinstance-to-instantiate.html">Older &#187;</a></div>
+      
+      
+      <div class="next"><a rel="next" href="/2012/05/intro-to-android-debug-logging.html">&#171; Newer</a></div>
+      
+    </div>
+
+    <div id="responsive-post-bottom-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="6089694851"
+           data-ad-format="auto"></ins>
+      <script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+    
+    <div class="post-comments">
+      <div id="disqus_thread"></div>
+      <script src="/scripts/disqus-lazy-load.js"></script>
+    </div>
+    
+  </div>
+
+  
+</div>
+
+<!-- Tweet button javascript -->
+<script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+<!-- Like button javascript -->
+<div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>About this Blog</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div class="g-plusone" data-annotation="inline" data-width="300" data-href=""></div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+  </body>
+</html>

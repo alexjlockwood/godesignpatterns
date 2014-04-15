@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Why Ice Cream Sandwich Crashes your App" />
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2012-06-18T00:00:00-04:00" />
+    <meta property="article:modified_time" content="2012-06-18T00:00:00-04:00" />
+    
+    <meta property="og:url" content="/2012/06/app-force-close-honeycomb-ics.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon.jpg" />
+    <title>Why Ice Cream Sandwich Crashes your App | Android Design Patterns</title>
+    <link rel="canonical" href="/2012/06/app-force-close-honeycomb-ics.html" />
+    <link rel="icon" href="/assets/images/favicon.jpg" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          <div itemscope itemtype="http://schema.org/BlogPosting" class="post">
+  <header><h1 itemprop="name">Why Ice Cream Sandwich Crashes your App</h1></header>
+
+  <div class="side">
+    <div class="date-posted" >
+      Posted <span itemprop="datePublished" content="2012-06-18T00:00:00-04:00" class="date">Jun 18, 2012</span>
+      <div class="author">by <a href="https://google.com/+AlexLockwood"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Alex Lockwood</span></span></a></div>
+    </div>
+
+    <div class="share-buttons">
+      <div class="g-plusone" data-size="medium"></div>
+      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+      <div class="fb-like" data-href="/2012/06/app-force-close-honeycomb-ics.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div itemprop="articleBody">
+      <p>The following question has plagued StackOverflow ever since Ice Cream
+Sandwich&#39;s initial release:</p>
+
+<blockquote>
+<p>My application works fine on devices running Android 2.x, but
+force closes on devices running Honeycomb (3.x) and Ice Cream
+Sandwich (4.x). Why does this occur?</p>
+</blockquote>
+
+<p>This is a great question; after all, newer versions of Android are
+released with the expectation that old apps will remain compatible
+with new devices. In my experience, there are a couple reasons why
+this might occur. Most of the time, however, the reason is simple:
+<em>you are performing a potentially expensive operation on the UI
+thread</em>.</p>
+
+<!--more-->
+
+<h3>What is the UI Thread?</h3>
+
+<p>The concept and importance of the  application&#39;s <strong>main UI thread</strong>
+is something every Android developer should understand. Each time an
+application is launched, the system creates a thread called &quot;main&quot;
+for the application. The main thread (also known as the &quot;UI thread&quot;)
+is in charge of dispatching events to the appropriate views/widgets
+and thus is very important. It&#39;s also the thread where your application
+interacts with running components of your application&#39;s UI. For instance,
+if you touch a button on the screen, the UI thread dispatches the touch
+event to the view, which then sets its pressed state and posts an invalidate
+request to the event queue. The UI thread dequeues this request and then
+tells the view to redraw itself.</p>
+
+<p>This single-thread model can yield poor performance unless Android
+applications are implemented properly. Specifically, if the UI thread
+was in charge of running everything in your entire application,
+performing long operations such as network access or database queries
+on the UI thread would block the entire user interface. No event would
+be able to be dispatched&mdash;including drawing and touchscreen
+events&mdash;while the long operation is underway. From the user&#39;s
+perspective, the application will appear to be frozen.</p>
+
+<p>In these situations, instant feedback is vital. Studies show that
+<strong>0.1 seconds</strong> is about the limit for having the user feel that
+the system is reacting instantaneously. Anything slower than this
+limit will probably be considered as <strong>lag</strong>
+(<a href="http://www.useit.com/papers/responsetime.html">Miller 1968; Card et al. 1991</a>).
+While a fraction of a second might not seem harmful, even a tenth
+of a second can be the difference between a good review and a bad
+review on Google Play. Even worse, if the UI thread is blocked
+for more than about five seconds, the user is presented with the
+notorious &quot;application not responding&quot; (ANR) dialog and the app is
+force closed.</p>
+
+<h3>Why Android Crashes Your App</h3>
+
+<p>The reason why your application crashes on Android versions 3.0 and above,
+but works fine on Android 2.x is because <strong>Honeycomb and Ice Cream Sandwich
+are much stricter about abuse against the UI Thread</strong>. For example, when
+an Android device running HoneyComb or above detects a network access on
+the UI thread, a <code>NetworkOnMainThreadException</code> will be thrown:</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">E/AndroidRuntime(673): java.lang.RuntimeException: Unable to start activity
+    ComponentInfo{com.example/com.example.ExampleActivity}: android.os.NetworkOnMainThreadException
+</code></pre></div>
+<p>The explanation as to why this occurs is well documented on the Android
+developer&#39;s site:</p>
+
+<blockquote>
+<p>A <code>NetworkOnMainThreadException</code> is thrown when an application
+attempts to perform a networking operation on its main thread. This is
+only thrown for applications targeting the Honeycomb SDK or higher.
+Applications targeting earlier SDK versions are allowed to do networking
+on their main event loop threads, but it&#39;s heavily discouraged.</p>
+</blockquote>
+
+<p>Some examples of other operations that ICS and Honeycomb <em>won&#39;t</em> allow
+you to perform on the UI thread are:</p>
+
+<ul>
+<li>Opening a <code>Socket</code> connection (i.e. <code>new Socket()</code>).</li>
+<li>HTTP requests (i.e. <code>HTTPClient</code> and <code>HTTPUrlConnection</code>).</li>
+<li>Attempting to connect to a remote MySQL database.</li>
+<li>Downloading a file (i.e. <code>Downloader.downloadFile()</code>).</li>
+</ul>
+
+<p>If you are attempting to perform any of these operations on the UI thread, you
+<em>must</em> wrap them in a worker thread. The easiest way to do this is to use
+of an <code>AsyncTask</code>, which allows you to perform asynchronous work on
+your user interface. An <code>AsyncTask</code> will perform the blocking operations
+in a worker thread and will publish the results on the UI thread, without
+requiring you to handle threads and/or handlers yourself.</p>
+
+<h3>Conclusion</h3>
+
+<p>The reason why I decided to write about this topic is because I have seen it
+come up on StackOverflow and other forums countless times. The majority of
+the time the error stems from placing expensive operations directly on the UI
+thread. To ensure you don&#39;t disrupt the user experience, it is very important
+to execute Socket connections, HTTP requests, file downloads, and other
+long-term operations on a separate Thread. The easiest way to do this is
+to wrap your operation in an AsyncTask, which launches a new thread and
+allows you to perform asynchronous work on your user interface.</p>
+
+<p>As always, let me know if this was helpful by +1-ing the post or leaving a
+comment below! Feel free to ask questions too... I respond to them quickly. :)</p>
+
+<h3>Helpful Links</h3>
+
+<p>Here are some helpful links that might help you get started with <code>AsyncTask</code>s:</p>
+
+<ul>
+<li><a href="http://developer.android.com/reference/android/os/AsyncTask.html"><code>AsyncTask</code></a> documentation</li>
+<li><a href="http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html">Multithreading For Performance</a></li>
+</ul>
+
+    </div>
+    
+    <div class="post-pagination">
+      
+      <div class="prev"><a rel="prev" href="/2012/06/compatability-manager-utility-class.html">Older &#187;</a></div>
+      
+      
+      <div class="next"><a rel="next" href="/2012/06/content-resolvers-and-content-providers.html">&#171; Newer</a></div>
+      
+    </div>
+
+    <div id="responsive-post-bottom-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="6089694851"
+           data-ad-format="auto"></ins>
+      <script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+    
+    <div class="post-comments">
+      <div id="disqus_thread"></div>
+      <script src="/scripts/disqus-lazy-load.js"></script>
+    </div>
+    
+  </div>
+
+  
+  <div class="side suggested">
+    <h4>Related Posts</h4>
+    <ul class="related">
+    <li><a href="/2013/08/fragment-transaction-commit-state-loss.html">Fragment Transactions &amp; Activity State Loss</a></li>
+    <li><a href="/2012/06/compatability-manager-utility-class.html">Ensuring Compatibility with a Utility Class</a></li>
+    <li><a href="/2013/01/inner-class-handler-memory-leak.html">How to Leak a Context: Handlers &amp; Inner Classes</a></li>
+    </ul>
+  </div>
+  
+</div>
+
+<!-- Tweet button javascript -->
+<script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+<!-- Like button javascript -->
+<div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>About this Blog</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div class="g-plusone" data-annotation="inline" data-width="300" data-href=""></div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+  </body>
+</html>

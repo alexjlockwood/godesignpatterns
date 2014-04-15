@@ -1,1 +1,49 @@
-Hello world!
+---
+layout: default
+title: Android Design Patterns
+description: 'Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.'
+---
+{% for post in paginator.posts %}
+  <article class="snippet">
+    <div class="side">
+      <div class="date-posted">
+        <span class="date-block">{{ post.date | date: "%b %-d %Y" }}</span>
+      </div>
+    </div>
+    <div class="body">
+      <header><h2 class="post-title no-border"><a href="{{ post.url }}">{{ post.title | escape }}</a></h2></header>
+      {{ post.excerpt }}
+      <footer>
+        <a class="read-more" href="{{ post.url }}">Read more&#8230;</a>
+      </footer>
+    </div>
+    <div class="clearfix"></div>
+  </article>
+  {% if forloop.index0 == 1 %}
+  <!-- Display ad after second post snippet -->
+  <!--<div id="responsive-home-page-first-ad">
+    <ins class="adsbygoogle"
+	 style="display:block"
+	 data-ad-client="ca-pub-3588752900040136"
+	 data-ad-slot="7147625658"
+	 data-ad-format="auto"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>-->
+  {% endif %}
+{% endfor %}
+{% if paginator.previous_page or paginator.next_page %}
+  <div class="mod-pagination">
+    {% if paginator.previous_page %}
+      {% if paginator.previous_page == 1 %}
+        <div class="prev"><a rel="prev" href="/">&#171; Newer</a></div>
+      {% else %}
+        <div class="prev"><a rel="prev" href="/page{{ paginator.previous_page }}">&#171; Newer</a></div>
+      {% endif %}
+    {% endif %}
+    {% if paginator.next_page %}
+      <div class="next"><a rel="next" href="/page{{ paginator.next_page }}">Older &#187;</a></div>
+    {% endif %}
+  </div>
+{% endif %}

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Life Before Loaders (part 1)" />
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2012-07-06T00:00:00-04:00" />
+    <meta property="article:modified_time" content="2014-01-18T00:00:00-05:00" />
+    
+    <meta property="og:url" content="/2012/07/loaders-and-loadermanager-background.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon256.png" />
+    <title>Life Before Loaders (part 1) | Android Design Patterns</title>
+    <link rel="canonical" href="/2012/07/loaders-and-loadermanager-background.html" />
+    <link rel="icon" href="/assets/images/favicon128.png" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          <div itemscope itemtype="http://schema.org/BlogPosting" class="post">
+  <header><h1 itemprop="name">Life Before Loaders (part 1)</h1></header>
+
+  <div class="side">
+    <div class="date-posted" >
+      Posted <span itemprop="datePublished" content="2012-07-06T00:00:00-04:00" class="date">Jul 6, 2012</span>
+      <div class="author">by <a href="https://google.com/+AlexLockwood"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Alex Lockwood</span></span></a></div>
+    </div>
+
+    <div class="share-buttons">
+      <div class="g-plusone" data-size="medium"></div>
+      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+      <div class="fb-like" data-href="/2012/07/loaders-and-loadermanager-background.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div itemprop="articleBody">
+      <p>This post gives a brief introduction to <code>Loader</code>s and the <code>LoaderManager</code>. The first
+section describes how data was loaded prior to the release of Android 3.0, pointing out out some of the flaws
+of the pre-Honeycomb APIs. The second section defines the purpose of each class and summarizes their powerful
+ability in asynchronously loading data.</p>
+
+<p>This is the first of a series of posts I will be writing on Loaders and the LoaderManager:</p>
+
+<ul>
+<li><strong>Part 1:</strong> <a href="/2012/07/loaders-and-loadermanager-background.html">Life Before Loaders</a></li>
+<li><strong>Part 2:</strong> <a href="/2012/07/understanding-loadermanager.html">Understanding the LoaderManager</a></li>
+<li><strong>Part 3:</strong> <a href="/2012/08/implementing-loaders.html">Implementing Loaders</a></li>
+<li><strong>Part 4:</strong> <a href="/2012/09/tutorial-loader-loadermanager.html">Tutorial: AppListLoader</a></li>
+</ul>
+
+<p>If you know nothing about <code>Loader</code>s and the <code>LoaderManager</code>, I strongly recommend you read the
+<a href="http://developer.android.com/guide/components/loaders.html">documentation</a> before continuing forward.</p>
+
+<h3>The Not-So-Distant Past</h3>
+
+<p>Before Android 3.0, many Android applications lacked in responsiveness. UI interactions glitched, transitions
+between activities lagged, and ANR (Application Not Responding) dialogs rendered apps totally useless. This
+lack of responsiveness stemmed mostly from the fact that developers were performing queries on the UI
+thread&mdash;a very poor choice for lengthy operations like loading data.</p>
+
+<p>While the <a href="http://developer.android.com/guide/practices/responsiveness.html">documentation</a> has always
+stressed the importance of instant feedback, the pre-Honeycomb APIs simply did not encourage this behavior. Before
+Loaders, cursors were primarily managed and queried for with two (now deprecated) <code>Activity</code> methods:</p>
+
+<!--more-->
+
+<ul>
+<li><p><code>public void startManagingCursor(Cursor)</code></p>
+
+<p>Tells the activity to take care of managing the cursor&#39;s lifecycle based on the activity&#39;s lifecycle. The
+cursor will automatically be deactivated (<code>deactivate()</code>) when the activity is stopped, and will
+automatically be closed (<code>close()</code>) when the activity is destroyed. When the activity is stopped
+and then later restarted, the Cursor is re-queried (<code>requery()</code>) for the most up-to-date data.</p></li>
+<li><p><code>public Cursor managedQuery(Uri, String, String, String, String)</code></p>
+
+<p>A wrapper around the <code>ContentResolver</code>&#39;s <code>query()</code> method. In addition to performing the
+query, it begins management of the cursor (that is, <code>startManagingCursor(cursor)</code> is called before
+it is returned).</p></li>
+</ul>
+
+<p>While convenient, these methods were deeply flawed in that they performed queries on the UI thread. What&#39;s more,
+the &quot;managed cursors&quot; did not retain their data across <code>Activity</code> configuration changes. The need to
+<code>requery()</code> the cursor&#39;s data in these situations was unnecessary, inefficient, and made orientation
+changes clunky and sluggish as a result.</p>
+
+<h3>The Problem with &quot;Managed <code>Cursor</code>s&quot;</h3>
+
+<p>Let&#39;s illustrate the problem with &quot;managed cursors&quot; through a simple code sample. Given below is a
+<code>ListActivity</code> that loads data using the pre-Honeycomb APIs. The activity makes a query
+to the <code>ContentProvider</code> and begins management of the returned cursor. The results are then bound to
+a <code>SimpleCursorAdapter</code>, and are displayed on the screen in a <code>ListView</code>. The code has
+been condensed for simplicity.</p>
+
+<div class="scrollable">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="java"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SampleListActivity</span> <span class="kd">extends</span> <span class="n">ListActivity</span> <span class="o">{</span>
+
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span><span class="o">[]</span> <span class="n">PROJECTION</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span><span class="s">&quot;_id&quot;</span><span class="o">,</span> <span class="s">&quot;text_column&quot;</span><span class="o">};</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+
+    <span class="c1">// Performs a &quot;managed query&quot; to the ContentProvider. The Activity </span>
+    <span class="c1">// will handle closing and requerying the cursor.</span>
+    <span class="c1">//</span>
+    <span class="c1">// WARNING!! This query (and any subsequent re-queries) will be</span>
+    <span class="c1">// performed on the UI Thread!!</span>
+    <span class="n">Cursor</span> <span class="n">cursor</span> <span class="o">=</span> <span class="n">managedQuery</span><span class="o">(</span>
+        <span class="n">CONTENT_URI</span><span class="o">,</span>  <span class="c1">// The Uri constant in your ContentProvider class</span>
+        <span class="n">PROJECTION</span><span class="o">,</span>   <span class="c1">// The columns to return for each data row</span>
+        <span class="kc">null</span><span class="o">,</span>         <span class="c1">// No where clause</span>
+        <span class="kc">null</span><span class="o">,</span>         <span class="c1">// No where clause</span>
+        <span class="kc">null</span><span class="o">);</span>        <span class="c1">// No sort order</span>
+
+    <span class="n">String</span><span class="o">[]</span> <span class="n">dataColumns</span> <span class="o">=</span> <span class="o">{</span> <span class="s">&quot;text_column&quot;</span> <span class="o">};</span>
+    <span class="kt">int</span><span class="o">[]</span> <span class="n">viewIDs</span> <span class="o">=</span> <span class="o">{</span> <span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">text_view</span> <span class="o">};</span>
+ 
+    <span class="c1">// Create the backing adapter for the ListView.</span>
+    <span class="c1">//</span>
+    <span class="c1">// WARNING!! While not readily obvious, using this constructor will </span>
+    <span class="c1">// tell the CursorAdapter to register a ContentObserver that will</span>
+    <span class="c1">// monitor the underlying data source. As part of the monitoring</span>
+    <span class="c1">// process, the ContentObserver will call requery() on the cursor </span>
+    <span class="c1">// each time the data is updated. Since Cursor#requery() is performed </span>
+    <span class="c1">// on the UI thread, this constructor should be avoided at all costs!</span>
+    <span class="n">SimpleCursorAdapter</span> <span class="n">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SimpleCursorAdapter</span><span class="o">(</span>
+        <span class="k">this</span><span class="o">,</span>                <span class="c1">// The Activity context</span>
+        <span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">list_item</span><span class="o">,</span>  <span class="c1">// Points to the XML for a list item</span>
+        <span class="n">cursor</span><span class="o">,</span>              <span class="c1">// Cursor that contains the data to display</span>
+        <span class="n">dataColumns</span><span class="o">,</span>         <span class="c1">// Bind the data in column &quot;text_column&quot;...</span>
+        <span class="n">viewIDs</span><span class="o">);</span>            <span class="c1">// ...to the TextView with id &quot;R.id.text_view&quot;</span>
+
+    <span class="c1">// Sets the ListView&#39;s adapter to be the cursor adapter that was </span>
+    <span class="c1">// just created.</span>
+    <span class="n">setListAdapter</span><span class="o">(</span><span class="n">adapter</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>There are three problems with the code above. If you have understood this post so far, the first two
+shouldn&#39;t be difficult to spot:</p>
+
+<ol>
+<li><p><code>managedQuery</code> performs a query on the main UI thread. This leads to unresponsive apps and
+ should no longer be used.</p></li>
+<li><p>As seen in the <code>Activity.java</code>
+ <a href="http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/1.5_r4/android/app/Activity.java#Activity.managedQuery%28android.net.Uri%2Cjava.lang.String%5B%5D%2Cjava.lang.String%2Cjava.lang.String%29">source code</a>,
+ the call to <code>managedQuery</code> begins management of the returned cursor with a call to
+ <code>startManagingCursor(cursor)</code>. Having the activity manage the cursor seems convenient at first, as we
+ no longer need to worry about deactivating/closing the cursor ourselves. However, this signals the activity to call
+ <code>requery()</code> on the cursor
+ <a href="http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/1.5_r4/android/app/Activity.java#3503">each time the activity returns from a stopped state</a>,
+ and therefore puts the UI thread at risk. This cost significantly outweighs the convenience of having the activity deactivate/close the cursor for us.</p></li>
+<li><p>The <code>SimpleCursorAdapter</code> constructor (line 32) is deprecated and should not be used. The
+ problem with this constructor is that it will have the <code>SimpleCursorAdapter</code> auto-requery
+ its data when changes are made. More specifically, the CursorAdapter will register a ContentObserver
+ that monitors the underlying data source for changes, calling <code>requery()</code> on its bound
+ cursor each time the data is modified. The
+ <a href="http://developer.android.com/reference/android/widget/SimpleCursorAdapter.html#SimpleCursorAdapter(android.content.Context, int, android.database.Cursor, java.lang.String[], int[], int)">standard constructor</a>
+ should be used instead (if you intend on loading the adapter&#39;s data with a <code>CursorLoader</code>,
+ make sure you pass <code>0</code> as the last argument). Don&#39;t worry if you couldn&#39;t spot this one...
+ it&#39;s a very subtle bug.</p></li>
+</ol>
+
+<p>With the first Android tablet about to be released, something had to be done to encourage UI-friendly development.
+The larger, 7-10&quot; Honeycomb tablets called for more complicated, interactive, multi-paned layouts. Further, the
+introduction of the <code>Fragment</code> meant that applications were about to become more dynamic and event-driven.
+A simple, single-threaded approach to loading data could no longer be encouraged. Thus, the <code>Loader</code> and
+the <code>LoaderManager</code> were born.</p>
+
+<h3>Android 3.0, Loaders, and the LoaderManager</h3>
+
+<p>Prior to Honeycomb, it was difficult to manage cursors, synchronize correctly with the UI thread, and ensure
+all queries occurred on a background thread. Android 3.0 introduced the <code>Loader</code> and <code>LoaderManager</code> classes
+to help simplify the process. Both classes are available for use in the Android Support Library, which
+supports all Android platforms back to Android 1.6.</p>
+
+<p>The new <code>Loader</code> API is a huge step forward, and significantly improves the user experience. <code>Loader</code>s ensure
+that all cursor operations are done asynchronously, thus eliminating the possibility of blocking the UI thread.
+Further, when managed by the <code>LoaderManager</code>, <code>Loader</code>s retain their existing cursor data across the activity
+instance (for example, when it is restarted due to a configuration change), thus saving the cursor from
+unnecessary, potentially expensive re-queries. As an added bonus, <code>Loader</code>s are intelligent enough to monitor
+the underlying data source for updates, re-querying automatically when the data is changed.</p>
+
+<h3>Conclusion</h3>
+
+<p>Since the introduction of <code>Loader</code>s in Honeycomb and Compatibility Library, Android applications have
+changed for the better. Making use of the now deprecated <code>startManagingCursor</code> and <code>managedQuery</code>
+methods are extremely discouraged; not only do they slow down your app, but they can potentially bring it to a
+screeching halt. <code>Loader</code>s, on the other hand, significantly speed up the user experience by offloading
+the work to a separate background thread.</p>
+
+<p>In the next post (titled <a href="/2012/07/understanding-loadermanager.html">Understanding the LoaderManager</a>),
+we will go more in-depth on how to fix these problems by completing the transition from &quot;managed cursors&quot; to
+making use of <code>Loader</code>s and the <code>LoaderManager</code>.</p>
+
+<p>Don&#39;t forget to +1 this blog in the top right corner if you found this helpful!</p>
+
+    </div>
+    
+    <div id="post-last-updated">Last updated January 18, 2014.</div>
+    
+    <div class="post-pagination">
+      
+      <div class="prev"><a rel="prev" href="/2012/06/content-resolvers-and-content-providers.html">Older &#187;</a></div>
+      
+      
+      <div class="next"><a rel="next" href="/2012/07/understanding-loadermanager.html">&#171; Newer</a></div>
+      
+    </div>
+
+    <div id="responsive-post-bottom-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="6089694851"
+           data-ad-format="auto"></ins>
+      <script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+    
+    <div class="post-comments">
+      <div id="disqus_thread"></div>
+      <script src="/scripts/disqus-lazy-load.js"></script>
+    </div>
+    
+  </div>
+
+  
+  <div class="side suggested">
+    <h4>Related Posts</h4>
+    <ul class="related">
+    <li><a href="/2013/08/fragment-transaction-commit-state-loss.html">Fragment Transactions &amp; Activity State Loss</a></li>
+    <li><a href="/2013/01/inner-class-handler-memory-leak.html">How to Leak a Context: Handlers &amp; Inner Classes</a></li>
+    <li><a href="/2013/04/activitys-threads-memory-leaks.html">Activitys, Threads, &amp; Memory Leaks</a></li>
+    </ul>
+  </div>
+  
+</div>
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>+1 this blog!</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div style="text-align:center">
+              <div class="g-plusone" data-href=""></div>
+	      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+	      <div class="fb-like" data-href="/2012/07/loaders-and-loadermanager-background.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+            </div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <!-- +1 button javascript -->
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+    <!-- Tweet button javascript -->
+    <script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+    <!-- Like button javascript -->
+    <div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+  </body>
+</html>

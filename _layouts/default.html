@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="{{ site.baseurl }}" />
+    {% if page.description %}
+    <meta name="description" content="{{ page.description | escape }}" />
+    <meta name="twitter:description" content="{{ page.description | escape }}" />
+    {% else %}
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="{{ site.description }}" />
+    {% endif %}
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="{{ page.title | escape }}" />
+    {% if page.path and page.path contains '_posts' %}
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
+    <meta property="article:modified_time" content="{% if page.updated %}{{ page.updated | date_to_xmlschema }}{% else %}{{ page.date | date_to_xmlschema }}{% endif %}" />
+    {% else %}
+    <meta property="og:type" content="blog" />
+    {% endif %}
+    <meta property="og:url" content="{{ site.baseurl }}{{ page.url }}" />
+    <meta property="og:site_name" content="{{ site.name }}" />
+    {% if page.thumbnails %}{% for thumbnail in page.thumbnails %}
+    <meta property="og:image" content="{{ site.baseurl }}{{ thumbnail }}" />
+    {% endfor %}{% endif %}
+    <meta property="og:image" content="{{ site.baseurl }}/assets/images/favicon256.png" />
+    <title>{{ page.title | escape }}{% if page.id %} | {{ site.name }}{% endif %}</title>
+    <link rel="canonical" href="{{ page.url }}" />
+    <link rel="icon" href="/assets/images/favicon128.png" type="image/x-icon">
+    <link href="{{ site.baseurl }}/feed.atom" rel="alternate" title="{{ site.name }} - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    {% if site.baseurl != "" %}<script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-32166730-1', 'androiddesignpatterns.com');
+      ga('send', 'pageview');
+    </script>{% endif %}
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">{{ site.name }}</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="{{ site.author.twitter }}" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="{{ site.author.github }}" class="github"><i class="icon-github-circled"></i></a>
+      <a href="{{ site.baseurl }}/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          {{ content }}
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>+1 this blog!</h3>
+            <p>{{ site.name }} is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div style="text-align:center">
+              <div class="g-plusone" data-href="{{ site.baseurl }}"></div>
+            </div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-{{ site.time | date: "%Y" }} {{ site.name }}</p>
+    </div>
+
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+  </body>
+</html>

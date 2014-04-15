@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="VqGny1x9EAeoXjY8v2hWFZGBUZFNQnavIOXVkY50mdk" />
+    <meta name="msvalidate.01" content="AFECEF07C08280E3BFA946DDCE26B76C" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@alexjlockwood" />
+    <meta name="twitter:creator" content="@alexjlockwood" />
+    <meta name="twitter:domain" content="" />
+    
+    <!-- Don't include normal description meta tag for now. Only include twitter:description since it is explicitly required. -->
+    <meta name="twitter:description" content="Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability." />
+    
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Designing for Backwards Compatibility" />
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2012-06-13T00:00:00-04:00" />
+    <meta property="article:modified_time" content="2012-06-13T00:00:00-04:00" />
+    
+    <meta property="og:url" content="/2012/06/designing-for-backwards-compatibility.html" />
+    <meta property="og:site_name" content="Android Design Patterns" />
+    
+    <meta property="og:image" content="/assets/images/favicon.jpg" />
+    <title>Designing for Backwards Compatibility | Android Design Patterns</title>
+    <link rel="canonical" href="/2012/06/designing-for-backwards-compatibility.html" />
+    <link rel="icon" href="/assets/images/favicon.jpg" type="image/x-icon">
+    <link href="/feed.atom" rel="alternate" title="Android Design Patterns - Feed" type="application/atom+xml" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+  </head>
+
+  <body>
+    <div id="header">
+      <div class="container">
+        <h3 id="blog-header"><a href="/">Android Design Patterns</a></h3>
+        <nav class="pull-right">
+          <a href="/archives/">Archives</a>
+          <a href="/about/">About</a>
+        </nav>
+      </div>
+    </div>
+
+    <div id="social" class="container">
+      <a href="https://plus.google.com/100751609891157863386?rel=author" class="googleplus"><i class="icon-gplus"></i></a>
+      <a href="https://twitter.com/alexjlockwood" class="twitter"><i class="icon-twitter"></i></a>
+      <a href="https://github.com/alexjlockwood" class="github"><i class="icon-github-circled"></i></a>
+      <a href="/feed.atom" class="rss"><i class="icon-rss"></i></a>
+    </div>
+
+    <div class="main container">
+      <div id="content">
+	<div class="blog-index">
+          <div itemscope itemtype="http://schema.org/BlogPosting" class="post">
+  <header><h1 itemprop="name">Designing for Backwards Compatibility</h1></header>
+
+  <div class="side">
+    <div class="date-posted" >
+      Posted <span itemprop="datePublished" content="2012-06-13T00:00:00-04:00" class="date">Jun 13, 2012</span>
+      <div class="author">by <a href="https://google.com/+AlexLockwood"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Alex Lockwood</span></span></a></div>
+    </div>
+
+    <div class="share-buttons">
+      <div class="g-plusone" data-size="medium"></div>
+      <div class="tweet"><a href="https://twitter.com/share" class="twitter-share-button" data-via="alexjlockwood" data-lang="en">Tweet</a></div>
+      <div class="fb-like" data-href="/2012/06/designing-for-backwards-compatibility.html" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div itemprop="articleBody">
+      <blockquote>
+<p>Note: please read this <a href="/2012/06/compatability-manager-utility-class.html">short post</a>
+before continuing forward.</p>
+</blockquote>
+
+<p>A common issue in Android development is backwards compatibility. How can we add cool
+new features from the most recent Android API while still ensuring that it runs
+correctly on devices running older versions of Android? This post discusses the
+problem by means of a simple example, and proposes a scalable, well-designed solution.</p>
+
+<!--more-->
+
+<h3>The Problem</h3>
+
+<p>Let&#39;s say we are writing an application that reads and writes pictures to new albums
+(i.e. folders) located on external storage, and that we want our application to support
+all devices running Donut (Android 1.6, SDK version 4) and above. Upon consulting the
+<a href="http://developer.android.com/guide/topics/data/data-storage.html#filesExternal">documentation</a>,
+we realize there is a slight problem. With the introduction of Froyo (Android 2.2,
+SDK version 8) came a somewhat radical change in how external storage was laid out
+and represented on Android devices, as well as several new API methods (see
+<a href="http://developer.android.com/reference/android/os/Environment.html">android.os.Environment</a>)
+that allow us access to the public storage directories. To ensure backwards compatibility
+all the way back to Donut, we must provide two separate implementations: one for older,
+pre-Froyo devices, and another for devices running Froyo and above.</p>
+
+<h3>Setting up the Manifest</h3>
+
+<p>Before we dive into the implementation, we will first update our <code>uses-sdk</code> tag in the Android
+manifest. There are two attributes we must set,</p>
+
+<ul>
+<li><p><code>android:minSdkVersion=&quot;4&quot;</code>. This attribute defines a minimum API level required for
+the application to run. We want our application to run on devices running Donut and above,
+so we set its value to <code>&quot;4&quot;</code>.</p></li>
+<li><p><code>android:targetSdkVersion=&quot;15&quot;</code>. This attribute is a little trickier to understand
+(and is incorrectly defined on blogs all over the internet). This attribute specifies
+the API level on which the application is designed to run. Preferably we would want
+its value to correspond to the most recently released SDK (<code>&quot;15&quot;</code>, at the time of this
+posting). Strictly speaking, however, its value should be given by the largest SDK
+version number that we have tested your application against (we will assume we have
+done so for the remainder of this example).</p></li>
+</ul>
+
+<p>The resulting tag in our manifest is as follows:</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">&lt;uses-sdk 
+    android:minSdkVersion=&quot;4&quot;
+    android:targetSdkVersion=&quot;15&quot; &gt;
+&lt;/uses-sdk&gt;
+</code></pre></div>
+<h3>Implementation</h3>
+
+<p>Our implementation will consist of an abstract class and two subclasses that extend
+it. The abstract <code>AlbumStorageDirFactory</code> class enforces a simple contract by
+requiring its subclasses to implement the <code>getAlbumStorageDir</code> method. The actual
+implementation of this method depends on the device&#39;s SDK version number. Specifically,
+if we are using a device running Froyo or above, its implementation will make use of
+new methods introduced in API level 8. Otherwise, the correct directory must be
+determined using pre-Froyo method calls, to ensure that our app remains backwards compatible.</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AlbumStorageDirFactory</span> <span class="o">{</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns a File object that points to the folder that will store </span>
+<span class="cm">   * the album&#39;s pictures. </span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">File</span> <span class="nf">getAlbumStorageDir</span><span class="o">(</span><span class="n">String</span> <span class="n">albumName</span><span class="o">);</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * A static factory method that returns a new AlbumStorageDirFactory </span>
+<span class="cm">   * instance based on the current device&#39;s SDK version.</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">AlbumStorageDirFactory</span> <span class="nf">newInstance</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// Note: the CompatibilityUtil class is implemented </span>
+    <span class="c1">// and discussed in a previous post, entitled </span>
+    <span class="c1">// &quot;Ensuring Compatibility with a Utility Class&quot;.</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">CompatabilityUtil</span><span class="o">.</span><span class="na">isFroyo</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nf">FroyoAlbumDirFactory</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nf">BaseAlbumDirFactory</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>The two subclasses and their implementation are given below.The class also provides
+a static factory <code>newInstance</code> method (note that this method makes use of the
+<code>CompatabilityUtil</code> utility class, which was both implemented and discussed in a
+<a href="/2012/06/compatability-manager-utility-class.html">previous post</a>).
+We discuss this method in detail in the next section.</p>
+
+<p>The <code>BaseAlbumDirFactory</code> subclass handles pre-Froyo SDK versions:</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BaseAlbumDirFactory</span> <span class="kd">extends</span> <span class="n">AlbumStorageDirFactory</span> <span class="o">{</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * For pre-Froyo devices, we must provide the name of the photo directory </span>
+<span class="cm">   * ourselves. We choose &quot;/dcim/&quot; as it is the widely considered to be the </span>
+<span class="cm">   * standard storage location for digital camera files.</span>
+<span class="cm">   */</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">CAMERA_DIR</span> <span class="o">=</span> <span class="s">&quot;/dcim/&quot;</span><span class="o">;</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">File</span> <span class="nf">getAlbumStorageDir</span><span class="o">(</span><span class="n">String</span> <span class="n">albumName</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStorageDirectory</span><span class="o">()</span> 
+            <span class="o">+</span> <span class="n">CAMERA_DIR</span> <span class="o">+</span> <span class="n">albumName</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>The <code>FroyoAlbumDirFactory</code> subclass handles Froyo and above:</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FroyoAlbumDirFactory</span> <span class="kd">extends</span> <span class="n">AlbumStorageDirFactory</span> <span class="o">{</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">File</span> <span class="nf">getAlbumStorageDir</span><span class="o">(</span><span class="n">String</span> <span class="n">albumName</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStoragePublicDirectory</span><span class="o">(</span>
+            <span class="n">Environment</span><span class="o">.</span><span class="na">DIRECTORY_PICTURES</span><span class="o">),</span> <span class="n">albumName</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<h3>Making Sense of the Pattern</h3>
+
+<p>Take a second to study the structure of the code above. Our implementation ensures
+compatibility with pre-Froyo devices through a simple design. To ensure compatibility,
+we simply request a new <code>AlbumStorageDirFactory</code> and call the abstract <code>getAlbumStorageDir</code>
+method. The subclass is determined and instantiated at runtime depending on the Android
+device&#39;s SDK version number. See the sample activity below for an example on how an ordinary
+Activity might use this pattern to retrieve an album&#39;s directory.</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SampleActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+
+  <span class="kd">private</span> <span class="n">AlbumStorageDirFactory</span> <span class="n">mAlbumFactory</span><span class="o">;</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+
+    <span class="c1">// Instantiate the AlbumStorageDirFactory. Instead of</span>
+    <span class="c1">// invoking the subclass&#39; default constructors directly,</span>
+    <span class="c1">// we make use of the Abstract Factory design pattern,</span>
+    <span class="c1">// which encapsulates the inner details. As a result, the</span>
+    <span class="c1">// Activity does not need to know `anything` about the</span>
+    <span class="c1">// compatibility-specific implementation--all of this is</span>
+    <span class="c1">// done behind the scenes within the &quot;mAlbumFactory&quot; object.     </span>
+    <span class="n">mAlbumFactory</span> <span class="o">=</span> <span class="n">AlbumStorageDirFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+
+    <span class="c1">// get the album&#39;s directory</span>
+    <span class="n">File</span> <span class="n">sampleAlbumDir</span> <span class="o">=</span> <span class="n">getAlbumDir</span><span class="o">(</span><span class="s">&quot;sample_album&quot;</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * A simple helper method that returns a File corresponding</span>
+<span class="cm">   * to the album named &quot;albumName&quot;. The helper method invokes</span>
+<span class="cm">   * the abstract &quot;getAlbumStorageDir&quot; method, which will return</span>
+<span class="cm">   * correct location of the directory depending on the subclass</span>
+<span class="cm">   * that was returned in &quot;newInstance&quot; (which depends entirely</span>
+<span class="cm">   * on the device&#39;s SDK version number).</span>
+<span class="cm">   */</span>
+  <span class="kd">private</span> <span class="n">File</span> <span class="nf">getAlbumDir</span><span class="o">(</span><span class="n">String</span> <span class="n">albumName</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">mAlbumStorageDirFactory</span><span class="o">.</span><span class="na">getAlbumStorageDir</span><span class="o">(</span><span class="n">albumName</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>There are a couple benefits to organizing the code the way we have:</p>
+
+<ul>
+<li><strong>It&#39;s easily extendable.</strong> While there is certainly no need to separate our
+implementations into classes for simple examples (such as the one discussed above),
+doing so is important when working with large, complicated projects, as it will ensure
+changes can quickly be made down the line.</li>
+<li><strong>It encapsulates the implementation-specific details.</strong> Abstracting these details
+from the client makes our code less cluttered and easier to read (note: in this case,
+&quot;the client&quot; was the person who wrote the Activity class).</li>
+</ul>
+
+<h3>Conclusion</h3>
+
+<p>Android developers constantly write code to ensure backwards compatibility. As projects
+expand and applications become more complex, it becomes increasingly important to ensure
+your implementation is properly designed. Hopefully this post helped and will encourage
+you to more elegant solutions in the future!</p>
+
+<p>Leave a comment if you have any questions or criticisms... or just to let me know that
+you managed to read through this entire post!</p>
+
+    </div>
+    
+    <div class="post-pagination">
+      
+      <div class="prev"><a rel="prev" href="/2012/05/intro-to-android-debug-logging.html">Older &#187;</a></div>
+      
+      
+      <div class="next"><a rel="next" href="/2012/06/compatability-manager-utility-class.html">&#171; Newer</a></div>
+      
+    </div>
+
+    <div id="responsive-post-bottom-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="6089694851"
+           data-ad-format="auto"></ins>
+      <script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+    
+    <div class="post-comments">
+      <div id="disqus_thread"></div>
+      <script src="/scripts/disqus-lazy-load.js"></script>
+    </div>
+    
+  </div>
+
+  
+</div>
+
+<!-- Tweet button javascript -->
+<script>!function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(!e.getElementById(f)){c=e.createElement(a);c.id=f;c.src="https://platform.twitter.com/widgets.js";b.parentNode.insertBefore(c,b)}}(document,"script","twitter-wjs");</script>
+
+<!-- Like button javascript -->
+<div id="fb-root"></div><script>(function(e,a,f){var c,b=e.getElementsByTagName(a)[0];if(e.getElementById(f)){return}c=e.createElement(a);c.id=f;c.src="//connect.facebook.net/en_US/all.js#xfbml=1";b.parentNode.insertBefore(c,b)}(document,"script","facebook-jssdk"));</script>
+
+	</div>
+      </div>
+
+      <div id="info" class="cf">
+	<div class="right">
+          <div class="box">
+            <h3>About this Blog</h3>
+            <p>Android Design Patterns is a website for developers who wish to better understand the Android application framework. The tutorials here emphasize proper code design and project maintainability.</p>
+            <div class="g-plusone" data-annotation="inline" data-width="300" data-href=""></div>
+          </div>
+          <div class="box">
+            <h3>Find a typo?</h3>
+            <p>Submit a pull request! The code powering this site is open-source and available on <a href="https://github.com/alexjlockwood/alexjlockwood.github.io">GitHub</a>. Corrections are appreciated and encouraged! Click <a href="https://github.com/alexjlockwood/alexjlockwood.github.io/blob/master/README.md#find-a-typo">here</a> for instructions.</p>
+          </div>
+	</div>
+	<div class="box gbadge">
+          <div class="g-person" data-href="//plus.google.com/+AlexLockwood" data-rel="author"></div>
+	</div>
+      </div>
+    </div>
+
+    <div id="responsive-home-page-bottom-ad" class="container">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3588752900040136"
+           data-ad-slot="3555030858"
+           data-ad-format="auto"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div id="copyright" class="container">
+      <p>&copy; 2012-2014 Android Design Patterns</p>
+    </div>
+
+    <script type="text/javascript">
+      (function(){var a=document.createElement("script");
+      a.type="text/javascript";a.async=true;a.src="https://apis.google.com/js/platform.js";
+      var b=document.getElementsByTagName("script")[0];
+      b.parentNode.insertBefore(a,b)})();
+    </script>
+
+  </body>
+</html>
