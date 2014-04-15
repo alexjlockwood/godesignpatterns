@@ -1,7 +1,7 @@
-Android Design Patterns
+Go Design Patterns
 =======================
 
-This is the source code for www.androiddesignpatterns.com. Android Design Patterns is powered by [Jekyll](http://jekyllrb.com/) and is hosted by [GitHub Pages](http://pages.github.com/).
+This is the source code for www.godesignpatterns.com. Go Design Patterns is powered by [Jekyll](http://jekyllrb.com/) and is hosted by [GitHub Pages](http://pages.github.com/).
 
 If you wish to fork this repository to use as the basis of your own blogging template, please make sure you review the [license and copyright](#license-and-copyright) information below.
 
