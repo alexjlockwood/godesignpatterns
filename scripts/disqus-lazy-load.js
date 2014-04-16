@@ -2,7 +2,7 @@ var comments = document.getElementById('disqus_thread');
 var disqus_loaded = false;
 
 function load_disqus() {
-    var disqus_shortname = 'androiddesignpatterns';
+    var disqus_shortname = 'godesignpatterns';
     disqus_loaded = true;
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
