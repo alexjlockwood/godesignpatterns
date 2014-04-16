@@ -106,11 +106,11 @@
     </div>-->
 
     <div id="copyright" class="container">
-      {% capture current_year %}2012{% endcapture %}
+      {% capture current_year %}{{ site.time | date: "%Y" }}{% endcapture %}
       {% if current_year == '2014' %}
       <p>&copy; 2014 {{ site.name }}</p>
       {% else %}
-      <p>&copy; 2014-{{ site.time | date: "%Y" }} {{ site.name }}</p>
+      <p>&copy; 2014-{{ current_year }} {{ site.name }}</p>
       {% endif %}
     </div>
 
