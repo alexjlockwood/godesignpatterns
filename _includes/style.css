@@ -710,3 +710,6 @@ html {
 .body {
   max-height: 999999px;
 }
+.fb-like.fb_iframe_widget span {
+  vertical-align: top !important;
+}
