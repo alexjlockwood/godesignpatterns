@@ -2,6 +2,8 @@
 
 @dark-green: #669900;
 @light-green: #99cc00;
+@dark-blue: #375EAB;
+@light-blue: #E0EBF5;
 
 body {
   background: #fff;
@@ -57,7 +59,7 @@ body {
   }
   blockquote {
     color: #666;
-    border-left: .5em @dark-green solid;
+    border-left: .5em @dark-blue solid;
     padding: 0 1em;
     font-style: italic;
   }
@@ -117,7 +119,7 @@ body {
 #header {
   margin: 0 auto;
   padding: 10px 0;
-  background: #E0EBF5;
+  background: @light-blue;
   ul li {
     padding-left: 30px;
     float: left;
@@ -174,22 +176,22 @@ body {
   -o-transition: color 0.3s;
   transition: color 0.3s;
   &:hover {
-    color: @dark-green;
+    color: @dark-blue;
     text-decoration: underline;
   }
 }
 a {
-  color: @dark-green;
+  color: @dark-blue;
   text-decoration: none;
   &:hover {
-    color: @light-green;
+//    color: @light-blue;
     text-decoration: underline;
   }
   code {
-    color: @dark-green;
+    color: @dark-blue;
   }
   &:hover code {
-    color: @light-green;
+//    color: @light-blue;
     text-decoration: underline;
   }
 }
@@ -234,7 +236,7 @@ sup {
   max-width: 1400px;
 }
 #social {
-  background: url('/assets/images/android1x.png') no-repeat left bottom;
+  background: url('/assets/images/gopher1x.png') no-repeat left bottom;
   padding-top: .5em;
   height: 32px;
   background-size: contain;
@@ -310,7 +312,7 @@ sup {
     -o-transition: background-color 0.4s;
     transition: background-color 0.4s;
     &:hover {
-      background: @dark-green;
+      background: @dark-blue;
       text-shadow: none;
       color: #f8f8f8;
     }
@@ -375,7 +377,7 @@ sup {
   width: 100%;
   text-align: center;
   display: inline-block;
-  background: @dark-green;
+  background: @dark-blue;
   color: #fff;
   padding: .5em 0;
   border-radius: 1px;
@@ -591,7 +593,7 @@ pre {
   }
   .side.suggested {
     clear: both;
-    border-top: 1px @light-green dotted;
+    border-top: 1px @light-blue dotted;
     margin-top: 40px;
     padding-top: 40px;
   }
@@ -708,7 +710,7 @@ img#profile-picture {
 }
 @media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
   #social {
-    background: url('/assets/images/android2x.png') no-repeat left bottom;
+    background: url('/assets/images/gopher1x.png') no-repeat left bottom;
     background-size: contain;
   }
 }

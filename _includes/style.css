@@ -53,7 +53,7 @@ body {
 }
 #content blockquote {
   color: #666;
-  border-left: 0.5em #669900 solid;
+  border-left: 0.5em #375eab solid;
   padding: 0 1em;
   font-style: italic;
 }
@@ -112,7 +112,7 @@ body {
 #header {
   margin: 0 auto;
   padding: 10px 0;
-  background: #E0EBF5;
+  background: #e0ebf5;
 }
 #header ul li {
   padding-left: 30px;
@@ -153,22 +153,20 @@ body {
   transition: color 0.3s;
 }
 .post-title a:hover {
-  color: #669900;
+  color: #375eab;
   text-decoration: underline;
 }
 a {
-  color: #669900;
+  color: #375eab;
   text-decoration: none;
 }
 a:hover {
-  color: #99cc00;
   text-decoration: underline;
 }
 a code {
-  color: #669900;
+  color: #375eab;
 }
 a:hover code {
-  color: #99cc00;
   text-decoration: underline;
 }
 .no-border a,
@@ -217,7 +215,7 @@ sup {
   max-width: 1400px;
 }
 #social {
-  background: url('/assets/images/android1x.png') no-repeat left bottom;
+  background: url('/assets/images/gopher1x.png') no-repeat left bottom;
   padding-top: .5em;
   height: 32px;
   background-size: contain;
@@ -295,7 +293,7 @@ sup {
   transition: background-color 0.4s;
 }
 .snippet a[class=read-more]:hover {
-  background: #669900;
+  background: #375eab;
   text-shadow: none;
   color: #f8f8f8;
 }
@@ -356,7 +354,7 @@ sup {
   width: 100%;
   text-align: center;
   display: inline-block;
-  background: #669900;
+  background: #375eab;
   color: #fff;
   padding: .5em 0;
   border-radius: 1px;
@@ -568,7 +566,7 @@ pre code {
   }
   .side.suggested {
     clear: both;
-    border-top: 1px #99cc00 dotted;
+    border-top: 1px #e0ebf5 dotted;
     margin-top: 40px;
     padding-top: 40px;
   }
@@ -683,7 +681,7 @@ img#profile-picture {
 }
 @media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
   #social {
-    background: url('/assets/images/android2x.png') no-repeat left bottom;
+    background: url('/assets/images/gopher1x.png') no-repeat left bottom;
     background-size: contain;
   }
 }
