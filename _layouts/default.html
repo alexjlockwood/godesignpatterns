@@ -109,9 +109,9 @@
     <div id="copyright" class="container">
       {% capture current_year %}{{ site.time | date: "%Y" }}{% endcapture %}
       {% if current_year == '2014' %}
-      <p>&copy; 2014 {{ site.name }}</p>
+      <p>&copy; 2014 {{ author.name }}</p>
       {% else %}
-      <p>&copy; 2014-{{ current_year }} {{ site.name }}</p>
+      <p>&copy; 2014-{{ current_year }} {{ author.name }}</p>
       {% endif %}
     </div>
 
