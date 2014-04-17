@@ -1,5 +1,5 @@
 ---
 layout: post
-title: Coming soon...
+title: 'Coming soon...'
 ---
-...I hope.
+...probably.
