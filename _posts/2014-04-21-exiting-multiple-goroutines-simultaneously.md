@@ -6,7 +6,8 @@ The ability to close channels (using Go's builtin `close()` function) forms the 
 
 This pattern makes use of the fact that performing a receive operation on a closed channel will never block. A short example is given below. You can also view it on the [Go Playground](http://play.golang.org/p/BFpSmmcnsE).
 
-```go
+<div class="scrollable">
+{% highlight go linenos=table %}
 package main
 
 import (
@@ -43,4 +44,5 @@ func routine(i int) {
 		done <- i
 	}
 }
-```
+{% endhighlight %}
+</div>
