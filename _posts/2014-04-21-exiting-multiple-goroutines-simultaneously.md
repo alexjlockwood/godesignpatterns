@@ -2,7 +2,9 @@
 layout: post
 title: 'Exiting Multiple Goroutines Simultaneously'
 ---
-The ability to close channels (using Go's builtin `close()` function) forms the basis of a useful pattern in Go: <i>using a single channel to exit multiple goroutines</i>. 
+The ability to close channels (using Go's builtin `close()` function) forms the basis of a useful pattern in Go:
+<i>using a single channel to exit multiple goroutines</i>. 
+
 This pattern makes use of the fact that performing a receive operation on a closed channel will never block.
 
 <div class="scrollable">
