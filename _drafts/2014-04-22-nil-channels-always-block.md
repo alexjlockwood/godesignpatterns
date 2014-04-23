@@ -7,7 +7,7 @@ sending on `nil` channels will always block:
 
 ```go
 // Create an uninitialized (nil) channel.
-var ch chan struct{}{}
+var ch chan struct{}
 
 // Receiving on a nil channel blocks forever.
 <-ch
