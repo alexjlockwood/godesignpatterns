@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'nil Channels Always Block'
+title: 'Nil Channels Always Block'
 ---
 Another useful idiom in Go makes use of the fact that receiving and
 sending on `nil` channels will always block:
