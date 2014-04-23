@@ -3,7 +3,11 @@ layout: post
 title: 'Implementing an Unbounded, Buffered Channel'
 ---
 In Go, channels can either be unbuffered or buffered, and those that are buffered
-cannot grow in size. The example below describes how one might go about
+cannot grow in size. Through some clever use of these channels, however, we can
+easily implement such a structure ourselves. This blog post will walk through
+the implementation of an "unbounded buffered channel".
+
+Our data structure will The example below describes how one might go about
 implementing a buffered channel with unlimited size.
 
 ```go
