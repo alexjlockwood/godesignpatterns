@@ -12,9 +12,9 @@ value, each of which are equivalent:
 
 ```go
 var buf bytes.Buffer
-p := &amp;buf
+p := &buf
 
-p := &amp;bytes.Buffer{}
+p := &bytes.Buffer{}
 
 p := new(bytes.Buffer)
 ```
@@ -36,7 +36,7 @@ below as an example:
 m := make(map[string]bool, 0)
 
 // Using a composite literal to initialize a map.
-m := map[string]bool{}</pre>
+m := map[string]bool{}
 ```
 
 You can also initialize maps with initial data using a composite literal, as shown below:
@@ -44,7 +44,7 @@ You can also initialize maps with initial data using a composite literal, as sho
 ```go
 m := map[string]bool{
     "java": false,
-    "go":   true",
+    "go":   true,
 }
 ```
 
