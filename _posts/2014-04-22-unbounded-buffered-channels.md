@@ -6,8 +6,6 @@ In Go, channels can either be unbuffered or buffered, and those that are buffere
 cannot grow in size. The example below describes how one might go about
 implementing a buffered channel with unlimited size.
 
-You can also view this example on the [Go Playground]()http://play.golang.org/p/RxHn6olGs1).
-
 ```go
 package main
 
@@ -86,3 +84,5 @@ func flush(buffer *list.List, out chan<- T) {
 	}
 }
 ```
+
+You can also view the above example on the [Go Playground](http://play.golang.org/p/RxHn6olGs1).
