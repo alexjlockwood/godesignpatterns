@@ -25,10 +25,8 @@ Here are some additional recommended resources that are also worth reading/consu
 * [Go Documentation][7]. Even more resources and documentation to help you learn Go!
 * [Go Talks][8]. A bunch of Go talks given over the years (slides and videos).
 * [Go Blog][9]. The official Go Programming Language blog. Check out the [index of all articles][10]
-  posted on the blog. The following articles are also highly recommended:
-  - [Go slices: usage and internals][11]
-  - [Go maps in action][12]
-  - [JSON in Go][13]
+  posted on the blog. The articles [Go slices: usage and internals][11] and [Go maps in action][12]
+  are both highly recommended.
 * [An Introduction to Programming in Go][14]. A book about programming in Go that is available online for free.
 
 [1]: http://tour.golang.org/
