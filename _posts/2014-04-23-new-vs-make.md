@@ -64,12 +64,15 @@ m := map[string]bool{
 }
 ```
 
-#### Recommended Readings:
+### Recommended Readings:
 
-* The [Allocation with new][1] and [Allocation with make][2] sections in Effective Go
-  (the [Constructors and composite literals][3] section is worth reading as well).
-* The [Allocation][4] and [Making slices, maps, and channels][5] sections in the
-  Go Programming Language Specification.
+* The following sections in [Effective Go][7]:
+  - [Allocation with new][1]
+  - [Allocation with make][2]
+  - [Constructors and composite literals][3]
+* The following sections in the [Go Programming Language Specification][8]:
+  - [Allocation][4]
+  - [Making slices, maps, and channels][5]
 
 [1]: http://golang.org/doc/effective_go.html#allocation_new
 [2]: http://golang.org/doc/effective_go.html#allocation_make
@@ -78,3 +81,4 @@ m := map[string]bool{
 [5]: http://golang.org/ref/spec#Making_slices_maps_and_channels
 [6]: http://tour.golang.org/
 [7]: http://golang.org/doc/effective_go.html
+[8]: http://golang.org/ref/spec
