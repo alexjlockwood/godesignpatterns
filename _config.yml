@@ -11,7 +11,7 @@ author:
 baseurl: http://www.godesignpatterns.com
 description: 'Description'
 
-paginate: 4
+paginate: 5
 excerpt_separator: <!--more-->
 
 pygments: true
