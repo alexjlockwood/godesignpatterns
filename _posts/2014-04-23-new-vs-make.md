@@ -2,8 +2,14 @@
 layout: post
 title: 'new() vs. make()'
 ---
-`new(T)` allocates zeroed storage for a new item of type
-`T` and returns its address, a value of type `*T`. 
+This post will quickly describe the differences between the
+builtin `new()` and `make()` functions in Go. 
+It assumes that you have completed [A Tour of Go][6] 
+and have consulted relevant sections of [Effective Go][7].
+
+The builtin `new(T)` function
+allocates "zeroed" storage for a new item of type
+`T` and returns its address, a value of type `*T`.
 In Go terminology, it returns a pointer to a newly
 allocated zero value of type `T`. For example,
 here are three different ways to create a pointer
@@ -11,25 +17,33 @@ here are three different ways to create a pointer
 value, each of which are equivalent:
 
 ```go
+// Allocate enough memory to store a bytes.Buffer value
+// and return a pointer to the value's address.
 var buf bytes.Buffer
 p := &buf
 
+// Use a composite literal to perform allocation and
+// return a pointer to the value's address.
 p := &bytes.Buffer{}
 
+// Use the new function to perform allocation, which will
+// return a pointer to the value's address.
 p := new(bytes.Buffer)
 ```
 
-`make()`, on the other hand, is a special built-in function
+<!--more-->
+
+The `make()` function, on the other hand, is a special built-in function
 that is used to initialize slices, maps, and channels.
 Note that `make()` can only be used to initialize
 slices, maps, and channels, and that, unlike the `new()`
 function, `make()` does not return a pointer.
 
-Note that slices, maps, and channels can be initialized using
-a composite literal expressions as well as with `make`. Two
+Slices, maps, and channels can also be initialized using
+a composite literal expressions, as well as with `make()`. Two
 different (yet equivalent) ways to initialize a map `m`
 which maps `string` keys to `bool` values are given
-below as an example:
+below as examples:
 
 ```go
 // Using make() to initialize a map.
@@ -60,3 +74,5 @@ m := map[string]bool{
 [3]: http://golang.org/doc/effective_go.html#composite_literals
 [4]: http://golang.org/ref/spec#Allocation
 [5]: http://golang.org/ref/spec#Making_slices_maps_and_channels
+[6]: http://tour.golang.org/
+[7]: http://golang.org/doc/effective_go.html
