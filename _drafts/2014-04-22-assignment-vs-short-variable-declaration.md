@@ -67,11 +67,10 @@ can only be done using a regular variable declaration: `var name type = value`).
   official Go Programming Language Specification.
 * The [Redeclaration and reassignment][3] section in Effective Go.
 * [Handling errors and Go][4] from the Go Blog.
-* The [Blank identifier in multiple assignment][6] section in Effective Go.
+* The [Blank identifier in multiple assignment][5] section in Effective Go.
 
 [1]: http://golang.org/ref/spec#Assignments
 [2]: http://golang.org/ref/spec#Short_variable_declarations
 [3]: http://golang.org/doc/effective_go.html#redeclaration
 [4]: http://blog.golang.org/error-handling-and-go
 [5]: http://golang.org/doc/effective_go.html#blank_assign
-[6]:
