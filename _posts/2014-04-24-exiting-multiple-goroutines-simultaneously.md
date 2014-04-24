@@ -10,6 +10,8 @@ Let's say we have launched a variable number of goroutines
 in the background as follows:
 
 ```go
+shutdown := make(chan struct{})
+
 for i := 0; i < n; i++ {
 	i := i
 	go func() {
@@ -23,14 +25,15 @@ for i := 0; i < n; i++ {
 
 <!--more-->
 
+Once started, each goroutine will wait for a signal
+from a single `shutdown` channel before exiting.
 We would like to signal all `n` goroutines to be shut down
-at once in the most elegant way possible. To do so, we
-cab use a single `shutdown` channel and make use of the
+at once in the most elegant way possible. To do so, we can
+make use of the
 fact that receiving on a closed channel will <i>never</i> block.
 Simply by closing the `shutdown` channel, we can
-signal all goroutines currently waiting to receive from the
-`shutdown` channel to "unblock," allowing them to exit.
-A more complete example is given below:
+signal all goroutines to "unblock," causing them to
+immediately exit. A complete example is given below:
 
 <div class="scrollable">
 {% highlight go linenos=table %}
