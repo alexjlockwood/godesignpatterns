@@ -82,6 +82,6 @@ and don't forget to +1 this post!
 
 ### Recommended Readings:
 
-* Documentation for the builtin [`close`](http://golang.org/pkg/builtin/#close) function in Go.
+* [Documentation](http://golang.org/pkg/builtin/#close) for the builtin `close` function in Go.
 * [Closing a channel](http://golang.org/pkg/builtin/#close) in the Go Programming Language Specification.
 * [Curious Channels](http://dave.cheney.net/2013/04/30/curious-channels) by Dave Cheney.
