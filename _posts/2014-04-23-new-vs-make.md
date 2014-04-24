@@ -64,6 +64,9 @@ m := map[string]bool{
 }
 ```
 
+Let me know if you have any questionsin the comments below,
+and don't forget to +1 this post if you found it helpful!
+
 ### Recommended Readings:
 
 * The following sections in [Effective Go][7]:

@@ -77,5 +77,11 @@ func main() {
 
 You can also view and run the above example on the [Go Playground](http://play.golang.org/p/O7lMdIN0JZ).
 
-Let me know if this example was helpful in the comments below,
-and don't forget to +1 this post if you found it helpful!
+Let me know if you found this pattern helpful in the comments below,
+and don't forget to +1 this post!
+
+### Recommended Readings:
+
+* Documentation for the builtin [`close`](http://golang.org/pkg/builtin/#close) function in Go.
+* [Closing a channel](http://golang.org/pkg/builtin/#close) in the Go Programming Language Specification.
+* [Curious Channels](http://dave.cheney.net/2013/04/30/curious-channels) by Dave Cheney.
