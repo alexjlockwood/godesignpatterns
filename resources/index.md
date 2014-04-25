@@ -1,7 +1,10 @@
 ---
-layout: post
-title: 'Helpful Go Resources'
+layout: default
+title: Go Resources
+id: 'resources/index'
 ---
+<header><h1>Helpful Go Resources</h1></header>
+
 The below documents are great resources for learning Go.
 Bookmark these links and consult them frequently as you
 learn the language!
