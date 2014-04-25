@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '= vs :='
+title: '= vs. :='
 ---
 This post will briefly describe the differences between
 the assignments and short variable declarations in Go. 
