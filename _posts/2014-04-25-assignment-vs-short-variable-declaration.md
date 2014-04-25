@@ -18,6 +18,8 @@ is used to perform [short variable declarations][2]),
 which are shorthand for regular variable declarations but
 without a specified type. 
 
+<!--more-->
+
 Here are four different ways to create a variable with
 static type `int` and value `10`, each of which are equivalent:
 
