@@ -2,6 +2,13 @@
 layout: post
 title: '= vs :='
 ---
+This post will briefly describe the differences between
+the assignments and short variable declarations in Go. 
+It assumes that you have completed [A Tour of Go][6] 
+and have consulted relevant sections of [Effective Go][7] and
+the target audience is primarily newcomers to the Go programming
+language.
+
 The <i>assignment operator</i> (`=`) is used to perform
 [assignments][1] (i.e. to assign or reassign values to
 already declared variables). 

@@ -2,7 +2,7 @@
 layout: post
 title: 'new() vs. make()'
 ---
-This post will quickly describe the differences between the
+This post will briefly describe the differences between the
 builtin `new()` and `make()` functions in Go. 
 It assumes that you have completed [A Tour of Go][6] 
 and have consulted relevant sections of [Effective Go][7] and
