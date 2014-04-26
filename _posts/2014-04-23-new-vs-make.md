@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'new() vs. make()'
+title: 'new() vs make()'
 ---
 This post will briefly describe the differences between the
 builtin `new()` and `make()` functions in Go. 

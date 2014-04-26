@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '= vs. :='
+title: '= vs :='
 ---
 This post will briefly describe the differences between
 the assignments and short variable declarations in Go. 
@@ -83,3 +83,5 @@ can only be done using a regular variable declaration: `var name type = value`).
 [3]: http://golang.org/doc/effective_go.html#redeclaration
 [4]: http://blog.golang.org/error-handling-and-go
 [5]: http://golang.org/doc/effective_go.html#blank_assign
+[6]: http://tour.golang.org/
+[7]: http://golang.org/doc/effective_go.html
