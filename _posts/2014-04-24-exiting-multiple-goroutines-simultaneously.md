@@ -11,6 +11,7 @@ in the background as follows:
 
 ```go
 shutdown := make(chan struct{})
+done := make(chan int)
 
 for i := 0; i < n; i++ {
 	i := i
