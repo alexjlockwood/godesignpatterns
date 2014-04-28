@@ -111,9 +111,13 @@
     <div id="copyright" class="container">
       {% capture current_year %}{{ site.time | date: "%Y" }}{% endcapture %}
       {% if current_year == '2014' %}
-      <p>&copy; 2014 {{ site.author.name }}</p>
+      <p>&copy; 2014 {{ site.author.name }} |
+	<a href="http://www.androiddesignpatterns.com">Android Design Patterns</a> |
+	<a href="{{ site.baseurl }}">Go Design Patterns</a></p>
       {% else %}
-      <p>&copy; 2014-{{ current_year }} {{ site.author.name }}</p>
+      <p>&copy; 2014-{{ current_year }} {{ site.author.name }} |
+	<a href="http://www.androiddesignpatterns.com">Android Design Patterns</a> |
+	<a href="{{ site.baseurl }}">Go Design Patterns</a></p>
       {% endif %}
     </div>
 
