@@ -1,7 +1,12 @@
 ---
 layout: post
-title: 'Arrays vs. Slices'
+title: 'Arrays vs Slices'
 ---
+This post will briefly describe the differences between the assignments and
+short variable declarations in Go. It assumes that you have completed
+[A Tour of Go][8] and have consulted relevant sections of [Effective Go][9] and
+the target audience is primarily newcomers to the Go programming language.
+
 [Arrays][1] are fixed-length sequences of items of the same type.
 Arrays in Go can be created using the following syntaxes:
 
@@ -16,6 +21,8 @@ are object references), arrays in Go are <i>values</i>. This has a
 couple of important implications: (1) assigning one array to another
 copies all of the elements, and (2) if you pass an array to a function,
 it will receive a copy of the array (not a pointer or reference to it).
+
+<!--more-->
 
 As you might imagine, this can be very expensive, especially when
 you are working with arrays that have a large number of elements.
@@ -41,7 +48,7 @@ make([]Type, length)
 Overall, slices are cleaner, more flexible, and less bug-prone than
 arrays, so you should prefer using them over arrays whenever possible.
 
-#### Recommended Readings:
+### Recommended Readings:
 
 * [Usage and Internals of Go Slices][4] from the Go Blog (<i>highly recommended</i>).
 * [Arrays, slices (and strings): The mechanics of 'append'][5] from the Go Blog.
@@ -57,3 +64,5 @@ arrays, so you should prefer using them over arrays whenever possible.
 [5]: http://blog.golang.org/slices
 [6]: https://code.google.com/p/go-wiki/wiki/SliceTricks
 [7]: http://golang.org/ref/spec
+[8]: http://tour.golang.org/
+[9]: http://golang.org/doc/effective_go.html
