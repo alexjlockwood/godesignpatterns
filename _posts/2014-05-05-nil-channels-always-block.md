@@ -2,8 +2,8 @@
 layout: post
 title: 'Nil Channels Always Block'
 ---
-Another useful idiom in Go makes use of the fact that receiving and
-sending on `nil` channels will always block:
+In this post, we will discuss a useful idiom in Go that makes use of the fact
+that receiving and sending on `nil` channels will always <i>block</i>:
 
 ```go
 // Create an uninitialized (nil) channel.
@@ -21,13 +21,15 @@ introduced bugs in your programs in the past (for example,
 if you forget to initialize your channels with `make` before
 you use them). However, this property can be leveraged in
 a couple of clever ways, especially when you need to dynamically
-disable a case in a select statement: 
+disable a case in a `select` statement:
+
+<!--more-->
 
 ```go
-if shouldDisable {
+if disableSelectCase {
 	ch1 = nil
 } else {
-	ch1 = someOtherNonNilChan
+	ch1 = nonNilChan
 }
 
 select {
@@ -40,11 +42,11 @@ case <-ch2:
 
 The code example above illustrates the fact that <b>when a nil
 channel is a case in a select statement, it is effectively ignored.</b>
-If the `shouldDisable` condition is `true`, we prevent `ch1` channel
+If the `disableSelectCase` boolean condition is `true`, we prevent `ch1` channel
 from being considered as part of the select statement by setting
 it to `nil`.
 
-This property can also be used to avoid spin loops—for example,
+This property can also be used to avoid spin loops&mdash;for example,
 if you need to wait on multiple channels to close:
 
 ```go
@@ -76,7 +78,7 @@ To solve this problem, we can leverage the property that `nil`
 channels always block:
 
 ```go
-// Safely disable channels after they are closed. 
+// Safely disable channels after they are closed.
 for ch1 != nil || ch2 != nil {
 	select {
 	case _, ok := <-ch1:
