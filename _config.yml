@@ -20,4 +20,7 @@ markdown: redcarpet
 relative_permalinks: false
 permalink: /:year/:month/:title.html
 
-exclude: ['README.md', 'LICENSE.txt']
+exclude: ['README.md', 'LICENSE.txt', 'sitemap.xml']
+
+gems:
+  - jekyll-sitemap
