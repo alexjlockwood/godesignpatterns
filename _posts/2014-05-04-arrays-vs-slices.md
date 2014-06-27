@@ -2,8 +2,7 @@
 layout: post
 title: 'Arrays vs Slices'
 ---
-This post will briefly describe the differences between the assignments and
-short variable declarations in Go. It assumes that you have completed
+This post will briefly describe the differences between arrays and slices in Go. It assumes that you have completed
 [A Tour of Go][8] and have consulted relevant sections of [Effective Go][9] and
 the target audience is primarily newcomers to the Go programming language.
 
