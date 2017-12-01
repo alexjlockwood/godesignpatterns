@@ -8,7 +8,7 @@ author:
   github: https://github.com/alexjlockwood
   feedburner: http://feeds.feedburner.com/godesignpatterns
 
-baseurl: http://www.godesignpatterns.com
+baseurl: https://www.godesignpatterns.com
 description: 'Go Design Patterns is a website for developers who wish to better understand the Go programming language. The tutorials here emphasize proper code design and project maintainability.'
 
 paginate: 5
