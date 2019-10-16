@@ -40,7 +40,7 @@ at least one variable is new and the redeclared variable is assigned
 a value of the same type. You'll see this property used frequently
 when dealing with errors, as it avoids the need to declare differently
 named variables such as `err1`, `err2`, etc. in the same block of code.
-For example, consider the `CopyFunc` function below, which opens two
+For example, consider the `CopyFile` function below, which opens two
 files and copies the contents of one file to the other:
 
 ```go
