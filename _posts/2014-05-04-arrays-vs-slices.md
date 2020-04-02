@@ -42,6 +42,7 @@ make([]Type, length, capacity)
 make([]Type, length)
 []Type{}
 []Type{value1, value2, ..., valueN}
+new([10]int)[0:5]   #length=5, capacity=10
 ```
 
 Overall, slices are cleaner, more flexible, and less bug-prone than
