@@ -64,7 +64,7 @@ m := map[string]bool{
 }
 ```
 
-Let me know if you have any questionsin the comments below,
+Let me know if you have any questions in the comments below,
 and don't forget to +1 this post if you found it helpful!
 
 ### Recommended Readings:
